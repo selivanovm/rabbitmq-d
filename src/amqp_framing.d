@@ -1,4 +1,5 @@
-import types;
+import amqp;
+import amqp_base;
 
 const uint AMQP_PROTOCOL_VERSION_MAJOR = 8;
 const uint AMQP_PROTOCOL_VERSION_MINOR = 0;
