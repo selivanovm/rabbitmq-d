@@ -10,22 +10,30 @@
 
 #include <assert.h>*/
 
-import types;
+import amqp_base;
+import amqp;
+import amqp_framing;
+import amqp_private;
 
 amqp_rpc_reply_t amqp_rpc_reply;
 
-#define RPC_REPLY(replytype)					\
-  (amqp_rpc_reply.reply_type == AMQP_RESPONSE_NORMAL		\
-   ? (replytype *) amqp_rpc_reply.reply.decoded	\
-   : NULL)
+template RPC_REPLY(alias replytype)		
+{
+  typeof(replytype) what()
+  {
+    if (amqp_rpc_reply.reply_type == AMQP_RESPONSE_NORMAL)
+      return cast(typeof(replytype)*) amqp_rpc_reply.reply.decoded;
+    else 
+      return null;
+  }
+}
 
 amqp_channel_open_ok_t *amqp_channel_open(amqp_connection_state_t state,
 					  amqp_channel_t channel)
 {
-  amqp_rpc_reply =
-    AMQP_SIMPLE_RPC(state, channel, CHANNEL, OPEN, OPEN_OK,
-		    amqp_channel_open_t,
-		    AMQP_EMPTY_BYTES);
+  amqp_channel_open_t acot = { AMQP_EMPTY_BYTES };
+  amqp_rpc_reply = amqp_simple_rpc(state, channel, AMQP_CHANNEL_OPEN_METHOD, AMQP_OPEN_OK_METHOD,
+		    amqp_channel_open_t, acot.out_of_band);
   return RPC_REPLY(amqp_channel_open_ok_t);
 }
 

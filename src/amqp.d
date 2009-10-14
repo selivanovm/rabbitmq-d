@@ -49,35 +49,35 @@ public static amqp_table_entry_t AMQP_TABLE_ENTRY_S(amqp_bytes_t k, VVV v)
 {
   VVV val;
   val.bytes = v.bytes;
-  return _AMQP_TE_INIT(amqp_cstring_bytes(k), 'S', val);
+  return _AMQP_TE_INIT(k, 'S', val);
 }
 
 public static amqp_table_entry_t AMQP_TABLE_ENTRY_I(amqp_bytes_t k, VVV v)
 {
   VVV val;
   val.i32 = v.i32;
-  return _AMQP_TE_INIT(amqp_cstring_bytes(k), 'I', val);
+  return _AMQP_TE_INIT(k, 'I', val);
 }
 
 public static amqp_table_entry_t AMQP_TABLE_ENTRY_D(amqp_bytes_t k, VVV v)
 {
   VVV val;
   val.decimal = v.decimal;
-  return _AMQP_TE_INIT(amqp_cstring_bytes(k), 'D', val);
+  return _AMQP_TE_INIT(k, 'D', val);
 }
 
 public static amqp_table_entry_t AMQP_TABLE_ENTRY_T(amqp_bytes_t k, VVV v)
 {
   VVV val;
   val.u64 = v.u64;
-  return _AMQP_TE_INIT(amqp_cstring_bytes(k), 'T', val);
+  return _AMQP_TE_INIT(k, 'T', val);
 }
 
 public static amqp_table_entry_t AMQP_TABLE_ENTRY_F(amqp_bytes_t k, VVV v)
 {
   VVV val;
   val.table = v.table;
-  return _AMQP_TE_INIT(amqp_cstring_bytes(k), 'F', val);
+  return _AMQP_TE_INIT(k, 'F', val);
 }
 
 struct amqp_pool_blocklist_t {
@@ -101,7 +101,7 @@ struct amqp_method_t {
   void *decoded;
 };
 
-struct amqp_frame_t_ {
+struct amqp_frame_t {
   uint8_t frame_type; /* 0 means no event */
   amqp_channel_t channel;
   union {
@@ -128,20 +128,20 @@ enum amqp_response_type_enum {
   AMQP_RESPONSE_SERVER_EXCEPTION
 };
 
-struct amqp_rpc_reply_t_ {
+struct amqp_rpc_reply_t {
   amqp_response_type_enum reply_type;
   amqp_method_t reply;
   int library_errno; /* if AMQP_RESPONSE_LIBRARY_EXCEPTION, then 0 here means socket EOF */
 };
 
-enum amqp_sasl_method_enum_ {
+enum amqp_sasl_method_enum {
   AMQP_SASL_METHOD_PLAIN = 0
 };
 
 const uint8_t AMQP_PSEUDOFRAME_PROTOCOL_HEADER = 'A';
 const amqp_channel_t AMQP_PSEUDOFRAME_PROTOCOL_CHANNEL = (((cast(int) 'M') << 8) | (cast(int) 'Q'));
 
-///typedef int (*amqp_output_fn_t)(void *context, void *buffer, size_t count);
+int function(void *context, void *buffer, size_t count) amqp_output_fn_t;
 
 /* Opaque struct. */
 ///struct amqp_connection_state_t_ { *amqp_connection_state_t };
@@ -224,14 +224,16 @@ extern amqp_rpc_reply_t amqp_simple_rpc(amqp_connection_state_t state,
 					amqp_method_number_t expected_reply_id,
 					void *decoded_request_method);
 
-#define AMQP_SIMPLE_RPC(state, channel, classname, requestname, replyname, structname, ...) \
-  ({									\
-    structname _simple_rpc_request___ = (structname) { __VA_ARGS__ };	\
-    amqp_simple_rpc(state, channel,					\
-		    AMQP_ ## classname ## _ ## requestname ## _METHOD,	\
-		    AMQP_ ## classname ## _ ## replyname ## _METHOD,	\
-		    &_simple_rpc_request___);				\
-  })
+
+public static void AMQP_SIMPLE_RPC(state, channel, classname, requestname, replyname, structname, ...) 
+{									
+    structname _simple_rpc_request___ = (structname) { __VA_ARGS__ };	
+    amqp_simple_rpc(state, channel,					
+		    AMQP_ ## classname ## _ ## requestname ## _METHOD,	
+		    AMQP_ ## classname ## _ ## replyname ## _METHOD,	
+		    &_simple_rpc_request___);				
+}
+
 
 extern amqp_rpc_reply_t amqp_login(amqp_connection_state_t state,
 				   char const *vhost,

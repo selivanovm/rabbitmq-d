@@ -48,7 +48,7 @@ struct amqp_queue_declare_t {
 };
 
 const amqp_method_number_t AMQP_QUEUE_DECLARE_OK_METHOD = 0x0032000B; /* 50, 11; 3276811 */
-struct amqp_queue_declare_ok_t_ {
+struct amqp_queue_declare_ok_t {
   amqp_bytes_t queue;
   uint32_t message_count;
   uint32_t consumer_count;

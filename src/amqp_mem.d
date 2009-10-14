@@ -1,5 +1,6 @@
 import amqp;
 import amqp_base;
+import tango.stdc.string;
 
 /***#include <stdlib.h>
 #include <stdio.h>
