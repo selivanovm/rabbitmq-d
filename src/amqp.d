@@ -101,24 +101,30 @@ struct amqp_method_t {
   void *decoded;
 };
 
+struct properties_ {
+  uint16_t class_id;
+  uint64_t body_size;
+  void *decoded;
+};
+
+struct protocol_header_ {
+  uint8_t transport_high;
+  uint8_t transport_low;
+  uint8_t protocol_version_major;
+  uint8_t protocol_version_minor;
+};
+
+union payload_ {
+  amqp_method_t method;
+  properties_ properties;
+  protocol_header_ protocol_header;
+  amqp_bytes_t body_fragment;
+};
+
 struct amqp_frame_t {
   uint8_t frame_type; /* 0 means no event */
+  payload_ payload;
   amqp_channel_t channel;
-  union {
-    amqp_method_t method;
-    struct {
-      uint16_t class_id;
-      uint64_t body_size;
-      void *decoded;
-    };
-    amqp_bytes_t body_fragment;
-    struct {
-      uint8_t transport_high;
-      uint8_t transport_low;
-      uint8_t protocol_version_major;
-      uint8_t protocol_version_minor;
-    };
-  };
 };
 
 enum amqp_response_type_enum {
@@ -134,7 +140,7 @@ struct amqp_rpc_reply_t {
   int library_errno; /* if AMQP_RESPONSE_LIBRARY_EXCEPTION, then 0 here means socket EOF */
 };
 
-enum amqp_sasl_method_enum {
+public enum amqp_sasl_method_enum {
   AMQP_SASL_METHOD_PLAIN = 0
 };
 

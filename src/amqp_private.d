@@ -69,6 +69,7 @@ struct amqp_connection_state_t {
   amqp_link_t *first_queued_frame;
   amqp_link_t *last_queued_frame;
 };
+//typedef *amqp_connection_state_t_ amqp_connection_state_t;
 
 T CHECK_LIMIT(T) (amqp_bytes_t b, int o, int l, T v)
 { 

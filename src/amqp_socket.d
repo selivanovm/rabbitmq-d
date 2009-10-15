@@ -18,22 +18,47 @@
 
 #include <assert.h>*/
 import tango.core.Vararg;
-import tango.net.Socket;
+import tango.net.Socket : hostent, gethostbyname, htons, close, socket_t;
+import tango.stdc.posix.sys.socket : SOCK_STREAM, socket, connect, sockaddr;
+import tango.stdc.posix.unistd : write, read;
+import tango.stdc.string;
 
 import amqp_base;
 import amqp;
 import amqp_framing;
 import amqp_private;
+import amqp_mem;
+import amqp_connection;
 
-int amqp_open_socket(char *hostname,
-		     int portnumber)
+import tango.stdc.stdlib;
+import tango.stdc.posix.arpa.inet : in_addr_t, in_port_t;
+
+const AF_INET = 2;
+const PF_INET = AF_INET;
+
+alias ushort sa_family_t;
+
+struct in_addr
+{
+    in_addr_t   s_addr;
+}
+
+struct sockaddr_in
+{
+    sa_family_t sin_family;
+    in_port_t   sin_port;
+    in_addr     sin_addr;
+}
+
+
+int amqp_open_socket(char *hostname, int portnumber)
 {
   int sockfd;
   sockaddr_in addr;
   hostent *he;
 
   he = gethostbyname(hostname);
-  if (he == NULL) {
+  if (he is null) {
     return -ENOENT;
   }
 
@@ -42,9 +67,9 @@ int amqp_open_socket(char *hostname,
   addr.sin_addr.s_addr = * cast(uint32_t *) he.h_addr_list[0];
 
   sockfd = socket(PF_INET, SOCK_STREAM, 0);
-  if (connect(sockfd, cast(sockaddr *) &addr, sizeof(addr)) < 0) {
+  if (connect(sockfd, cast(sockaddr *) &addr, addr.sizeof) < 0) {
     int result = -errno;
-    close(sockfd);
+    close(cast(socket_t)sockfd);
     return result;
   }
 
@@ -61,15 +86,15 @@ static char *header() {
   header[5] = 1;
   header[6] = AMQP_PROTOCOL_VERSION_MAJOR;
   header[7] = AMQP_PROTOCOL_VERSION_MINOR;
-  return header;
+  return header.ptr;
 }
 
-int amqp_send_header(amqp_connection_state_t state) {
+int amqp_send_header(amqp_connection_state_t *state) {
   return write(state.sockfd, header(), 8);
 }
 
-int amqp_send_header_to(amqp_connection_state_t state,
-			int function(void *context, void *buffer, size_t count),
+int amqp_send_header_to(amqp_connection_state_t *state,
+			int function(void *context, void *buffer, size_t count) fn,
 			void *context)
 {
   return fn(context, header(), 8);
@@ -77,8 +102,11 @@ int amqp_send_header_to(amqp_connection_state_t state,
 
 static amqp_bytes_t sasl_method_name(amqp_sasl_method_enum method) {
   switch (method) {
-  case AMQP_SASL_METHOD_PLAIN: 
-    amqp_bytes_t r = { len : 5, bytes : "PLAIN" };
+  case (amqp_sasl_method_enum.AMQP_SASL_METHOD_PLAIN): 
+    char *plain = "PLAIN";
+    amqp_bytes_t r;
+    r.len = 5;
+    r.bytes = cast(void*)plain;
     return r;
   default:
     amqp_assert(0, "Invalid SASL method: %d", cast(int) method);
@@ -93,11 +121,11 @@ static amqp_bytes_t sasl_response(amqp_pool_t *pool,
   amqp_bytes_t response;
 
   switch (method) {
-    case AMQP_SASL_METHOD_PLAIN: 
+  case (amqp_sasl_method_enum.AMQP_SASL_METHOD_PLAIN): 
       {
-	char* username = va_arg(args);
+	char* username = va_arg!(char*)(args);
 	size_t username_len = strlen(username);
-	char *password = va_arg(args);
+	char *password = va_arg!(char*)(args);
 	size_t password_len = strlen(password);
 	amqp_pool_alloc_bytes(pool, strlen(username) + strlen(password) + 2, &response);
 	*BUF_AT(response, 0) = 0;
@@ -114,10 +142,10 @@ static amqp_bytes_t sasl_response(amqp_pool_t *pool,
 }
 
 amqp_boolean_t amqp_frames_enqueued(amqp_connection_state_t state) {
-  return (state.first_queued_frame !is null);
+  return cast(amqp_boolean_t)(state.first_queued_frame !is null);
 }
 
-static int wait_frame_inner(amqp_connection_state_t state,
+static int wait_frame_inner(amqp_connection_state_t *state,
 			    amqp_frame_t *decoded_frame)
 {
   while (1) {
@@ -155,14 +183,14 @@ static int wait_frame_inner(amqp_connection_state_t state,
   }
 }
 
-int amqp_simple_wait_frame(amqp_connection_state_t state,
+int amqp_simple_wait_frame(amqp_connection_state_t *state,
 			   amqp_frame_t *decoded_frame)
 {
-  if (state.first_queued_frame != NULL) {
+  if (state.first_queued_frame !is null) {
     amqp_frame_t *f = cast(amqp_frame_t *) state.first_queued_frame.data;
     state.first_queued_frame = state.first_queued_frame.next;
-    if (state.first_queued_frame == NULL) {
-      state.last_queued_frame = NULL;
+    if (state.first_queued_frame is null) {
+      state.last_queued_frame = null;
     }
     *decoded_frame = *f;
     return 1;
@@ -171,7 +199,7 @@ int amqp_simple_wait_frame(amqp_connection_state_t state,
   }
 }
 
-int amqp_simple_wait_method(amqp_connection_state_t state,
+int amqp_simple_wait_method(amqp_connection_state_t *state,
 			    amqp_channel_t expected_channel,
 			    amqp_method_number_t expected_method,
 			    amqp_method_t *output)
@@ -198,7 +226,7 @@ int amqp_simple_wait_method(amqp_connection_state_t state,
   return 1;
 }
 
-int amqp_send_method(amqp_connection_state_t state,
+int amqp_send_method(amqp_connection_state_t *state,
 		     amqp_channel_t channel,
 		     amqp_method_number_t id,
 		     void *decoded)
@@ -212,7 +240,7 @@ int amqp_send_method(amqp_connection_state_t state,
   return amqp_send_frame(state, &frame);
 }
 
-amqp_rpc_reply_t amqp_simple_rpc(amqp_connection_state_t state,
+amqp_rpc_reply_t amqp_simple_rpc(amqp_connection_state_t *state,
 				 amqp_channel_t channel,
 				 amqp_method_number_t request_id,
 				 amqp_method_number_t expected_reply_id,
@@ -221,11 +249,11 @@ amqp_rpc_reply_t amqp_simple_rpc(amqp_connection_state_t state,
   int status;
   amqp_rpc_reply_t result;
 
-  memset(&result, 0, sizeof(result));
+  memset(&result, 0, result.sizeof);
 
   status = amqp_send_method(state, channel, request_id, decoded_request_method);
   if (status < 0) {
-    result.reply_type = AMQP_RESPONSE_LIBRARY_EXCEPTION;
+    result.reply_type = amqp_response_type_enum.AMQP_RESPONSE_LIBRARY_EXCEPTION;
     result.library_errno = -status;
     return result;
   }
@@ -236,7 +264,7 @@ amqp_rpc_reply_t amqp_simple_rpc(amqp_connection_state_t state,
   retry:
     status = wait_frame_inner(state, &frame);
     if (status <= 0) {
-      result.reply_type = AMQP_RESPONSE_LIBRARY_EXCEPTION;
+      result.reply_type = amqp_response_type_enum.AMQP_RESPONSE_LIBRARY_EXCEPTION;
       result.library_errno = -status;
       return result;
     }
@@ -257,15 +285,15 @@ amqp_rpc_reply_t amqp_simple_rpc(amqp_connection_state_t state,
 	       ((frame.channel == 0) &&
 		(frame.payload.method.id == AMQP_CONNECTION_CLOSE_METHOD))   ) ))
     {	     
-      amqp_frame_t *frame_copy = amqp_pool_alloc(&state.decoding_pool, sizeof(amqp_frame_t));
-      amqp_link_t *link = amqp_pool_alloc(&state.decoding_pool, sizeof(amqp_link_t));
+      amqp_frame_t *frame_copy = cast(amqp_frame_t *)amqp_pool_alloc(&state.decoding_pool, amqp_frame_t.sizeof);
+      amqp_link_t *link = cast(amqp_link_t *)amqp_pool_alloc(&state.decoding_pool, amqp_link_t.sizeof);
 
       *frame_copy = frame;
 
-      link.next = NULL;
+      link.next = null;
       link.data = frame_copy;
 
-      if (state.last_queued_frame == NULL) {
+      if (state.last_queued_frame is null) {
 	state.first_queued_frame = link;
       } else {
 	state.last_queued_frame.next = link;
@@ -276,15 +304,15 @@ amqp_rpc_reply_t amqp_simple_rpc(amqp_connection_state_t state,
     }
 
     result.reply_type = (frame.payload.method.id == expected_reply_id)
-      ? AMQP_RESPONSE_NORMAL
-      : AMQP_RESPONSE_SERVER_EXCEPTION;
+      ? amqp_response_type_enum.AMQP_RESPONSE_NORMAL
+      : amqp_response_type_enum.AMQP_RESPONSE_SERVER_EXCEPTION;
 
     result.reply = frame.payload.method;
     return result;
   }
 }
 
-static int amqp_login_inner(amqp_connection_state_t state,
+static int amqp_login_inner(amqp_connection_state_t *state,
 			    int channel_max,
 			    int frame_max,
 			    int heartbeat,
@@ -313,13 +341,18 @@ static int amqp_login_inner(amqp_connection_state_t state,
 
   {
     amqp_bytes_t response_bytes = sasl_response(&state.decoding_pool, sasl_method, vl);
-    amqp_connection_start_ok_t s =
-      {
-      client_properties : { num_entries : 0, entries : NULL},
-      mechanism : sasl_method_name(sasl_method),
-      response : response_bytes,
-      locale : { len : 5, bytes : "en_US" }
-      };
+    amqp_connection_start_ok_t s;
+    amqp_table_t cp;
+    cp.num_entries = 0;
+    cp.entries = null;
+    char* us = "en_US";
+    amqp_bytes_t l;
+    l.len = 5;
+    l.bytes = us;
+    s.client_properties = cp;
+    s.mechanism = sasl_method_name(sasl_method);
+    s.response = response_bytes;
+    s.locale = l;
     AMQP_CHECK_RESULT(amqp_send_method(state, 0, AMQP_CONNECTION_START_OK_METHOD, &s));
   }
 
@@ -348,12 +381,10 @@ static int amqp_login_inner(amqp_connection_state_t state,
   AMQP_CHECK_RESULT(amqp_tune_connection(state, channel_max, frame_max, heartbeat));
 
   {
-    amqp_connection_tune_ok_t s =
-      {
-        channel_max : channel_max,
-	frame_max : frame_max,
-	heartbeat : heartbeat
-      };
+    amqp_connection_tune_ok_t s;
+    s.channel_max = channel_max;
+    s.frame_max = frame_max;
+    s.heartbeat = heartbeat;
     AMQP_CHECK_RESULT(amqp_send_method(state, 0, AMQP_CONNECTION_TUNE_OK_METHOD, &s));
   }
 
@@ -362,7 +393,7 @@ static int amqp_login_inner(amqp_connection_state_t state,
   return 1;
 }
 
-amqp_rpc_reply_t amqp_login(amqp_connection_state_t state,
+amqp_rpc_reply_t amqp_login(amqp_connection_state_t *state,
 			    char *vhost,
 			    int channel_max,
 			    int frame_max,
@@ -378,18 +409,19 @@ amqp_rpc_reply_t amqp_login(amqp_connection_state_t state,
   amqp_login_inner(state, channel_max, frame_max, heartbeat, sasl_method, vl);
 
   {
-    amqp_connection_open_t s =
-      {
-        virtual_host : amqp_cstring_bytes(vhost),
-	capabilities : { len : 0, bytes : null },
-	insist : 1
-      };
+    amqp_connection_open_t s;
+    amqp_bytes_t caps;
+    caps.len = 0;
+    caps.bytes = null;
+    s.virtual_host = amqp_cstring_bytes(vhost);
+    s.capabilities = caps;
+    s.insist = 1;
     result = amqp_simple_rpc(state,
 			     0,
 			     AMQP_CONNECTION_OPEN_METHOD,
 			     AMQP_CONNECTION_OPEN_OK_METHOD,
 			     &s);
-    if (result.reply_type != AMQP_RESPONSE_NORMAL) {
+    if (result.reply_type != amqp_response_type_enum.AMQP_RESPONSE_NORMAL) {
       return result;
     }
   }
@@ -397,9 +429,9 @@ amqp_rpc_reply_t amqp_login(amqp_connection_state_t state,
 
   va_end(vl);
 
-  result.reply_type = AMQP_RESPONSE_NORMAL;
+  result.reply_type = amqp_response_type_enum.AMQP_RESPONSE_NORMAL;
   result.reply.id = 0;
-  result.reply.decoded = NULL;
+  result.reply.decoded = null;
   result.library_errno = 0;
   return result;
 }
