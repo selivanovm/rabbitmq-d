@@ -1,5 +1,3 @@
-//alias uint uint32_t;
-//alias ushort uint16_t;
 public import tango.stdc.inttypes;
 public import tango.stdc.errno;
 

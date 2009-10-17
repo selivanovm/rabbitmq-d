@@ -8,6 +8,7 @@ import amqp_connection;
 import amqp_mem;
 import tango.stdc.string;
 import tango.stdc.stdio;
+import tango.io.Stdout;
 amqp_rpc_reply_t amqp_rpc_reply;
 template RPC_REPLY(T)
 {
@@ -21,8 +22,10 @@ return null;
 }
 amqp_channel_open_ok_t* amqp_channel_open(amqp_connection_state_t* state, amqp_channel_t channel)
 {
+Stdout.format("amqp_channel_open #START").newline;
 amqp_channel_open_t acot = {AMQP_EMPTY_BYTES};
 amqp_rpc_reply = amqp_simple_rpc(state,channel,AMQP_CHANNEL_OPEN_METHOD,AMQP_CHANNEL_OPEN_OK_METHOD,cast(void*)&acot);
+Stdout.format("amqp_channel_open #RETURN").newline;
 return RPC_REPLY!(amqp_channel_open_ok_t).resolve();
 }
 int amqp_basic_publish(amqp_connection_state_t* state, amqp_channel_t channel, amqp_bytes_t exchange, amqp_bytes_t routing_key, amqp_boolean_t mandatory, amqp_boolean_t immediate, amqp_basic_properties_t* properties, amqp_bytes_t bo_dy);

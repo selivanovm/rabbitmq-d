@@ -71,13 +71,14 @@ struct amqp_connection_state_t {
 };
 //typedef *amqp_connection_state_t_ amqp_connection_state_t;
 
-T CHECK_LIMIT(T) (amqp_bytes_t b, int o, int l, T v)
-{ 
-  if ((o + l) > b.len) 
-    return cast(T)-EFAULT; 
-  else return v; 
+template CL(T) {
+  T CHECK_LIMIT (amqp_bytes_t b, int o, int l, T v)
+  { 
+    assert ((o + l) <= b.len);
+    return v;
+      //      return -EFAULT; 
+  }
 }
-
 public static uint8_t* BUF_AT(amqp_bytes_t b, int o) 
 {
   return (&((cast(uint8_t *) b.bytes)[o]));
@@ -86,21 +87,21 @@ public static uint8_t* BUF_AT(amqp_bytes_t b, int o)
 
 public static uint8_t D_8(amqp_bytes_t b, int o)
 {
-  return CHECK_LIMIT(b, o, 1, *(cast(uint8_t *) BUF_AT(b, o)));
+  return CL!(uint8_t).CHECK_LIMIT(b, o, 1, *(cast(uint8_t *) BUF_AT(b, o)));
 }
 
 public static uint16_t D_16(amqp_bytes_t b, int o) 
 {
   uint16_t v; 
   memcpy(&v, BUF_AT(b, o), 2); 
-  return CHECK_LIMIT(b, o, 2, ntohs(v));
+  return CL!(uint16_t).CHECK_LIMIT(b, o, 2, ntohs(v));
 }
 
 public static uint32_t D_32(amqp_bytes_t b, int o) 
 {
   uint32_t v; 
   memcpy(&v, BUF_AT(b, o), 4); 
-  return CHECK_LIMIT(b, o, 4, ntohl(v));
+  return CL!(uint32_t).CHECK_LIMIT(b, o, 4, ntohl(v));
 }
 
 public static uint64_t D_64(amqp_bytes_t b, int o) 
@@ -112,28 +113,27 @@ public static uint64_t D_64(amqp_bytes_t b, int o)
 
 public static uint8_t* D_BYTES(amqp_bytes_t b, int o, int l) 
 {
-  return CHECK_LIMIT(b, o, l, BUF_AT(b, o));
+  return CL!(uint8_t*).CHECK_LIMIT(b, o, l, BUF_AT(b, o));
 }
 
 public static uint8_t E_8(amqp_bytes_t b, int o, uint8_t v) 
 {
-  uint8_t vv = *(cast(uint8_t *) BUF_AT(b, o));
-  vv = v;
-  return CHECK_LIMIT(b, o, 1, vv);
+  *(cast(uint8_t *) BUF_AT(b, o)) = v;
+  return CL!(uint8_t).CHECK_LIMIT(b, o, 1, *(cast(uint8_t *) BUF_AT(b, o)));
 }
 
 public static uint16_t E_16(amqp_bytes_t b, int o, uint16_t v)
 {
   uint16_t vv = htons(v); 
   memcpy(BUF_AT(b, o), &vv, 2);
-  return CHECK_LIMIT(b, o, 2, vv);
+  return CL!(uint16_t).CHECK_LIMIT(b, o, 2, vv);
 }
 
 public static uint32_t E_32(amqp_bytes_t b, int o, uint32_t v)
 { 
   uint32_t vv = htonl(v); 
   memcpy(BUF_AT(b, o), &vv, 4);
-  return CHECK_LIMIT(b, o, 4, vv);
+  return CL!(uint32_t).CHECK_LIMIT(b, o, 4, vv);
 }
 
 public static uint64_t E_64(amqp_bytes_t b, int o, int v) 
@@ -144,17 +144,17 @@ public static uint64_t E_64(amqp_bytes_t b, int o, int v)
 
 public static void E_BYTES(amqp_bytes_t b, int o, int l, void* v)
 {
-  CHECK_LIMIT(b, o, l, memcpy(BUF_AT(b, o), v, l));
+  CL!(void*).CHECK_LIMIT(b, o, l, memcpy(BUF_AT(b, o), v, l));
 }
 
-extern int amqp_decode_table(amqp_bytes_t encoded,
+/*extern int amqp_decode_table(amqp_bytes_t encoded,
 			     amqp_pool_t *pool,
 			     amqp_table_t *output,
 			     int *offsetptr);
 
 extern int amqp_encode_table(amqp_bytes_t encoded,
 			     amqp_table_t *input,
-			     int *offsetptr);
+			     int *offsetptr);*/
 
 public static void amqp_assert(bool condition, ...)
 {						

@@ -2,6 +2,8 @@ import amqp;
 import amqp_base;
 import tango.stdc.string;
 import tango.stdc.stdlib;
+import tango.io.Stdout;
+import tango.stdc.errno;
 
 /***#include <stdlib.h>
 #include <stdio.h>
@@ -127,8 +129,11 @@ void *amqp_pool_alloc(amqp_pool_t *pool, size_t amount) {
 }
 
 void amqp_pool_alloc_bytes(amqp_pool_t *pool, size_t amount, amqp_bytes_t *output) {
+  Stdout.format("amqp_pool_alloc_bytes #1").newline;
+
   (*output).len = amount;
   (*output).bytes = amqp_pool_alloc(pool, amount);
+  Stdout.format("amqp_pool_alloc_bytes #2").newline;
 }
 
 amqp_bytes_t amqp_cstring_bytes(char *cstr) {
