@@ -162,10 +162,8 @@ static int wait_frame_inner(amqp_connection_state_t *state,
 
       Stdout.format("wait_frame_inner #2").newline;
 
-      //      AMQP_CHECK_RESULT((
       result = amqp_handle_input(state, buffer, decoded_frame);
 	if (result < 0) return result;		
-			//);
 
     Stdout.format("wait_frame_inner #3").newline;
 

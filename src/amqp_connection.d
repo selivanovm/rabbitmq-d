@@ -128,6 +128,7 @@ int amqp_handle_input(amqp_connection_state_t *state,
 {
   int total_bytes_consumed = 0;
   int bytes_consumed;
+  int result_ = -1;
 
   Stdout.format("amqp_handle_input #1").newline;
 
@@ -223,8 +224,6 @@ int amqp_handle_input(amqp_connection_state_t *state,
 					       &(*state).decoding_pool,
 					       encoded,
 					       &((*decoded_frame).payload.method.decoded));
-	  //	  AMQP_CHECK_RESULT(
-
 	  if (_result < 0) return _result;		
 
 	  Stdout.format("amqp_handle_input #914").newline;
@@ -241,10 +240,16 @@ int amqp_handle_input(amqp_connection_state_t *state,
 	  (*decoded_frame).frame_type = AMQP_FRAME_HEADER;
 	  (*decoded_frame).payload.properties.class_id = D_16((*state).inbound_buffer, HEADER_SIZE);
 	  (*decoded_frame).payload.properties.body_size = D_64((*state).inbound_buffer, HEADER_SIZE+4);
-	  AMQP_CHECK_RESULT(amqp_decode_properties((*decoded_frame).payload.properties.class_id,
+
+	  Stdout.format("amqp_handle_input #921").newline;
+
+	  result_ = amqp_decode_properties((*decoded_frame).payload.properties.class_id,
 						   &(*state).decoding_pool,
 						   encoded,
-						   &((*decoded_frame).payload.properties.decoded)));
+						   &((*decoded_frame).payload.properties.decoded));
+	  if (result_ < 0)
+	    return result_;
+
 	  break;
 	}
 
@@ -490,21 +495,34 @@ int amqp_send_frame_to(amqp_connection_state_t *state,
   int payload_len;
   int separate_body;
 
+  int result_ = -1;
+
   separate_body = inner_send_frame(state, frame, &encoded, &payload_len);
   switch (separate_body) {
     case 0:
-      AMQP_CHECK_RESULT(fn(context,
+      result_ = fn(context,
 			   (*state).outbound_buffer.bytes,
-			   payload_len + (HEADER_SIZE + FOOTER_SIZE)));
+			   payload_len + (HEADER_SIZE + FOOTER_SIZE));
+      if(result_ < 0)
+	return result_;
+
       return 0;
 
     case 1:
-      AMQP_CHECK_RESULT(fn(context, (*state).outbound_buffer.bytes, HEADER_SIZE));
-      AMQP_CHECK_RESULT(fn(context, encoded.bytes, payload_len));
+      result_ = fn(context, (*state).outbound_buffer.bytes, HEADER_SIZE);
+      if(result_ < 0)
+	return result_;
+
+      result_ = fn(context, encoded.bytes, payload_len);
+      if(result_ < 0)
+	return result_;
+
       {
 	assert(FOOTER_SIZE == 1);
 	char frame_end_byte = AMQP_FRAME_END;
-	AMQP_CHECK_RESULT(fn(context, &frame_end_byte, FOOTER_SIZE));
+	result_ = fn(context, &frame_end_byte, FOOTER_SIZE);
+	if(result_ < 0)
+	  return result_;
       }
       return 0;
 

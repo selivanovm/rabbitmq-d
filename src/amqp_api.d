@@ -286,6 +286,8 @@ int amqp_basic_ack(amqp_connection_state_t *state,
   amqp_basic_ack_t m;
   m.delivery_tag = delivery_tag;
   m.multiple = multiple;
-  AMQP_CHECK_RESULT(amqp_send_method(state, channel, AMQP_BASIC_ACK_METHOD, &m));
+  int result_ = amqp_send_method(state, channel, AMQP_BASIC_ACK_METHOD, &m);
+  if(result_ < 0)
+    return result_;
   return 0;
 }

@@ -143,12 +143,12 @@ amqp_bytes_t amqp_cstring_bytes(char *cstr) {
   return result;
 }
 
-/***amqp_bytes_t amqp_bytes_malloc_dup(amqp_bytes_t src) {
+amqp_bytes_t amqp_bytes_malloc_dup(amqp_bytes_t src) {
   amqp_bytes_t result;
   result.len = src.len;
   result.bytes = malloc(src.len);
-  if (result.bytes != NULL) {
+  if (result.bytes !is null) {
     memcpy(result.bytes, src.bytes, src.len);
   }
   return result;
-  }***/
+}

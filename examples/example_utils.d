@@ -1,13 +1,3 @@
-/*#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
-#include <stdint.h>
-#include <amqp.h>
-#include <amqp_framing.h>
-
-#include <sys/time.h>
-#include <unistd.h>*/
 import tango.stdc.stdio;
 import tango.stdc.string;
 import tango.stdc.stdlib;
@@ -71,4 +61,11 @@ ulong now_microseconds() {
   timeval tv;
   gettimeofday(&tv, null);
   return cast(ulong) tv.tv_sec * 1000000 + cast(ulong) tv.tv_usec;
+}
+
+char[] getString(char* s, uint l) {
+  char[] result = new char[l];
+  for(uint i = 0; i < l; i++)
+    result[i] = *(s + i);
+  return result;
 }

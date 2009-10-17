@@ -17,6 +17,8 @@ int amqp_decode_table(amqp_bytes_t encoded,
 
   Stdout.format("amqp_decode_table #1").newline;
 
+  int result_ = -1;
+
   int offset = *offsetptr;
   uint32_t tablesize = D_32(encoded, offset);
   int num_entries = 0;
@@ -83,7 +85,9 @@ int amqp_decode_table(amqp_bytes_t encoded,
 	offset += 8;
 	break;
       case 'F':
-	AMQP_CHECK_RESULT(amqp_decode_table(encoded, pool, &((*entry).value.table), &offset));
+	result_ = amqp_decode_table(encoded, pool, &((*entry).value.table), &offset);
+	if(result_ < 0)
+	  return result_;
 	break;
       default:
 	return -EINVAL;
@@ -110,6 +114,7 @@ int amqp_encode_table(amqp_bytes_t encoded,
   int offset = *offsetptr;
   int tablesize_offset = offset;
   int i;
+  int result_ = -1;
 
   offset += 4; /* skip space for the size of the table to be filled in later */
 
@@ -147,7 +152,9 @@ int amqp_encode_table(amqp_bytes_t encoded,
 	offset += 8;
 	break;
       case 'F':
-	AMQP_CHECK_RESULT(amqp_encode_table(encoded, &((*entry).value.table), &offset));
+	result_ = amqp_encode_table(encoded, &((*entry).value.table), &offset);
+	if(result_ < 0)
+	  return result_;
 	break;
       default:
 	return -EINVAL;
