@@ -1,6 +1,7 @@
 import tango.stdc.stdlib;
-import tango.stdc.posix.unistd : write;
+//import tango.stdc.posix.unistd : write;
 import tango.io.Stdout;
+import tango.net.Socket;
 
 import amqp_base;
 import amqp_private;
@@ -8,6 +9,7 @@ import amqp;
 import amqp_mem;
 import amqp_framing;
 import amqp_framing_;
+import amqp_socket;
 
 const INITIAL_FRAME_POOL_PAGE_SIZE = 65536;
 const INITIAL_DECODING_POOL_PAGE_SIZE = 131072;
@@ -23,7 +25,7 @@ public static void ENFORCE_STATE(amqp_connection_state_t *statevec, int statenum
 	      (*_check_state).state);					
 }
 
-amqp_connection_state_t* amqp_new_connection() {
+amqp_connection_state_t* amqp_new_connection(Socket socket) {
   amqp_connection_state_t* state =
     cast(amqp_connection_state_t*) calloc(1, amqp_connection_state_t.sizeof);
 
@@ -48,7 +50,7 @@ amqp_connection_state_t* amqp_new_connection() {
   (*state).inbound_offset = 0;
   (*state).target_size = HEADER_SIZE;
 
-  (*state).sockfd = -1;
+  (*state).socket = socket;
   (*state).sock_inbound_buffer.len = INITIAL_INBOUND_SOCK_BUFFER_SIZE;
   (*state).sock_inbound_buffer.bytes = malloc(INITIAL_INBOUND_SOCK_BUFFER_SIZE);
   if ((*state).sock_inbound_buffer.bytes is null) {
@@ -65,14 +67,14 @@ amqp_connection_state_t* amqp_new_connection() {
   return state;
 }
 
-int amqp_get_sockfd(amqp_connection_state_t *state) {
-  return (*state).sockfd;
+Socket amqp_get_sockfd(amqp_connection_state_t *state) {
+  return (*state).socket;
 }
 
 void amqp_set_sockfd(amqp_connection_state_t *state,
-		     int sockfd)
+		     Socket socket)
 {
-  (*state).sockfd = sockfd;
+  (*state).socket = socket;
 }
 
 int amqp_tune_connection(amqp_connection_state_t *state,
@@ -112,6 +114,7 @@ void amqp_destroy_connection(amqp_connection_state_t *state) {
   empty_amqp_pool(&(*state).decoding_pool);
   free((*state).outbound_buffer.bytes);
   free((*state).sock_inbound_buffer.bytes);
+  (*state).socket.shutdown(SocketShutdown.BOTH);
   free(state);
 }
 
@@ -435,7 +438,7 @@ int amqp_send_frame(amqp_connection_state_t *state,
   separate_body = inner_send_frame(state, frame, &encoded, &payload_len);
   switch (separate_body) {
     case 0:
-      Stdout.format("amqp_send_frame #1 {} {} {}", (*state).sockfd, (*state).outbound_buffer.bytes, 
+      Stdout.format("amqp_send_frame #1 {} {} {}", (*state).socket.sock, (*state).outbound_buffer.bytes, 
 		    payload_len + (HEADER_SIZE + FOOTER_SIZE)).newline;
 
       for(uint i = 0; i < payload_len + (HEADER_SIZE + FOOTER_SIZE); i++)
@@ -444,9 +447,10 @@ int amqp_send_frame(amqp_connection_state_t *state,
 
       Stdout.format("").newline; 
 
-      result_ = write((*state).sockfd,
-			  (*state).outbound_buffer.bytes,
-			  payload_len + (HEADER_SIZE + FOOTER_SIZE));
+      result_ = send_buffer_to_socket((*state).socket, (*state).outbound_buffer.bytes,
+				     payload_len + (HEADER_SIZE + FOOTER_SIZE));
+
+	//write((*state).sockfd,
 
       Stdout.format("amqp_send_frame #21").newline;
       if(result_ < 0)
@@ -459,18 +463,22 @@ int amqp_send_frame(amqp_connection_state_t *state,
 
     case 1:
       Stdout.format("amqp_send_frame #2").newline;
-      result_ = write((*state).sockfd, (*state).outbound_buffer.bytes, HEADER_SIZE);
+      result_ = send_buffer_to_socket((*state).socket, (*state).outbound_buffer.bytes, HEADER_SIZE);
+	//write(
       if(result_ < 0)
 	return result_;
 
-      result_ = write((*state).sockfd, encoded.bytes, payload_len);
+      result_ = send_buffer_to_socket((*state).socket, encoded.bytes, payload_len);
+	//write
       if(result_ < 0)
 	return result_;
 
       {
 	assert(FOOTER_SIZE == 1);
 	char frame_end_byte = AMQP_FRAME_END;
-	result_ = write((*state).sockfd, &frame_end_byte, FOOTER_SIZE);
+	result_ = send_buffer_to_socket((*state).socket, &frame_end_byte, FOOTER_SIZE);
+	  //write
+
 	if(result_ < 0)
 	  return result_;
 	

@@ -1,11 +1,13 @@
 import tango.stdc.stdarg;
-import tango.net.Socket : hostent, gethostbyname, close, socket_t, inet_addr;
-import tango.stdc.posix.sys.socket : SOCK_STREAM, socket, connect, sockaddr;
-import tango.stdc.posix.unistd : write, read;
-import tango.stdc.string;
+import tango.net.Socket;
+import tango.net.InternetAddress;
+// : hostent, gethostbyname, close, socket_t, inet_addr;
+//import tango.stdc.posix.sys.socket : SOCK_STREAM, socket, connect, sockaddr;
+//import tango.stdc.posix.unistd : write, read;
+import tango.stdc.string : strlenn = strlen, memcpy, memset;
 import tango.stdc.posix.arpa.inet : htons;
 import tango.stdc.stdlib;
-import tango.stdc.posix.arpa.inet : in_addr_t, in_port_t;
+//import tango.stdc.posix.arpa.inet : in_addr_t, in_port_t;
 import tango.io.Stdout;
 
 import amqp_base;
@@ -21,7 +23,7 @@ const PF_INET = AF_INET;
 
 alias ushort sa_family_t;
 
-struct in_addr
+/*struct in_addr
 {
     in_addr_t   s_addr;
 }
@@ -32,12 +34,18 @@ struct sockaddr_in
   in_port_t   sin_port;
   in_addr     sin_addr;
   char[8] sin_zero = 0;
-}
+  }*/
 
 
-int amqp_open_socket(char *hostname, int portnumber)
+Socket amqp_open_socket(char[] hostname, int portnumber)
 {
-  int sockfd;
+  
+  Socket socket = new Socket(AddressFamily.INET, SocketType.STREAM, ProtocolType.IP, true);
+
+  socket.connect(new InternetAddress (hostname, portnumber));
+  return socket;
+
+  /*  int sockfd;
   sockaddr_in addr;
   hostent *he;
 
@@ -68,7 +76,7 @@ int amqp_open_socket(char *hostname, int portnumber)
 
   Stdout.format("#3").newline;
 
-  return sockfd;
+  return sockfd;*/
 }
 
 static char *header() {
@@ -85,7 +93,7 @@ static char *header() {
 }
 
 int amqp_send_header(amqp_connection_state_t *state) {
-  return write(state.sockfd, header(), 8);
+  return send_buffer_to_socket(state.socket, header(), 8);
 }
 
 int amqp_send_header_to(amqp_connection_state_t *state,
@@ -122,12 +130,12 @@ static amqp_bytes_t sasl_response(amqp_pool_t *pool,
 	char* username = va_arg!(char*)(args);
 	Stdout.format("username = [{}]", *username).newline;
 	Stdout.format("sasl_response #3").newline;
-	size_t username_len = strlen(username);
+	size_t username_len = strlenn(username);
 
 	char *password = va_arg!(char*)(args);
-	size_t password_len = strlen(password);
+	size_t password_len = strlenn(password);
 
-	amqp_pool_alloc_bytes(pool, strlen(username) + strlen(password) + 2, &response);
+	amqp_pool_alloc_bytes(pool, strlenn(username) + strlenn(password) + 2, &response);
 	Stdout.format("sasl_response #3").newline;
 	*BUF_AT(response, 0) = 0;
 	memcpy((cast(char *) response.bytes) + 1, username, username_len);
@@ -181,7 +189,7 @@ static int wait_frame_inner(amqp_connection_state_t *state,
 
     Stdout.format("wait_frame_inner #5").newline;
 
-    result = read(state.sockfd,
+    result = receive_buffer_from_socket(state.socket,
 		  state.sock_inbound_buffer.bytes,
 		  state.sock_inbound_buffer.len);
     if (result < 0) {
@@ -517,5 +525,27 @@ amqp_rpc_reply_t amqp_login(amqp_connection_state_t *state,
 
   Stdout.format("amqp_login #END").newline;
 
+  return result;
+}
+
+int send_buffer_to_socket(Socket socket, void* buffer, uint length) {
+  Stdout.format("send_buffer_to_socket #START . socket = {}", socket).newline;
+
+  void[] buf_array = new void[length];
+  memcpy(buf_array.ptr, buffer, length);
+  //  for(uint i = 0; i < length; i++)
+  //    buf_array[i] = *(buffer + i);
+
+  return socket.send(buf_array, SocketFlags.NONE);
+}
+
+int receive_buffer_from_socket(Socket socket, void* buffer, uint length) {
+  void[] buf_array = new void[length];
+
+  int result = socket.receive(buf_array, SocketFlags.NONE);
+  if (result < 0)
+    return result;
+
+  memcpy(buffer, buf_array.ptr, buf_array.length);
   return result;
 }

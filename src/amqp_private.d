@@ -1,4 +1,5 @@
-import tango.stdc.posix.arpa.inet; /* ntohl, htonl, ntohs, htons */
+//import tango.stdc.posix.arpa.inet; /* ntohl, htonl, ntohs, htons */
+import tango.net.Socket;
 import tango.stdc.string;
 import tango.stdc.stdio;
 import tango.stdc.stdlib;
@@ -61,7 +62,8 @@ struct amqp_connection_state_t {
 
   amqp_bytes_t outbound_buffer;
 
-  int sockfd;
+  //int sockfd;
+  Socket socket;
   amqp_bytes_t sock_inbound_buffer;
   size_t sock_inbound_offset;
   size_t sock_inbound_limit;
@@ -165,12 +167,12 @@ public static void amqp_assert(bool condition, ...)
   }						
 }
 
-public static int AMQP_CHECK_RESULT(int expr)			
+/*public static int AMQP_CHECK_RESULT(int expr)			
 {						
   int _result = (expr);			
   if (_result < 0) return _result;
   //  _result;					
-}
+  }*/
 
 public static int AMQP_CHECK_EOF_RESULT(int expr)		
 {						

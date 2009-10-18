@@ -20,12 +20,12 @@ import example_utils;
 //extern void amqp_dump(void const *buffer, size_t len);
 
 int main(char[][] args) {
-  char *hostname;
+  char[] hostname;
   int port;
   char *exchange;
   char *bindingkey;
 
-  int sockfd;
+  Socket socket;
   amqp_connection_state_t *conn;
 
   amqp_bytes_t queuename;
@@ -35,15 +35,15 @@ int main(char[][] args) {
     return 1;
   }
 
-  hostname = args[1].ptr;
+  hostname = args[1];
   port = atoi(args[2].ptr);
   exchange = args[3].ptr;
   bindingkey = args[4].ptr;
 
-  conn = amqp_new_connection();
+  socket = amqp_open_socket(hostname, port);
 
-  die_on_error(sockfd = amqp_open_socket(hostname, port), "Opening socket");
-  amqp_set_sockfd(conn, sockfd);
+  conn = amqp_new_connection(socket);
+
   die_on_amqp_error(amqp_login(conn, "test".ptr, 0, 131072, 0, amqp_sasl_method_enum.AMQP_SASL_METHOD_PLAIN, "user".ptr, "123".ptr),
 		    "Logging in");
   amqp_channel_open(conn, 1);
@@ -159,7 +159,6 @@ int main(char[][] args) {
   die_on_amqp_error(amqp_channel_close(conn, 1, AMQP_REPLY_SUCCESS), "Closing channel");
   die_on_amqp_error(amqp_connection_close(conn, AMQP_REPLY_SUCCESS), "Closing connection");
   amqp_destroy_connection(conn);
-  die_on_error(close(cast(socket_t)sockfd), "Closing socket");
 
   return 0;
 }

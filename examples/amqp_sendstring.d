@@ -28,7 +28,7 @@ import example_utils;
 
 public static void main(char[][] args) {
 
-  char *hostname;
+  char[] hostname;
   int port;
   char *exchange;
   char *routingkey;
@@ -36,7 +36,7 @@ public static void main(char[][] args) {
 
   Socket socket;
 
-  int sockfd;
+  //  int sockfd;
   amqp_connection_state_t *conn;
 
   if (args.length < 6) {
@@ -46,25 +46,16 @@ public static void main(char[][] args) {
 
   Stdout.format("{} {} {} {} {}", args[1], args[2], args[3], args[4], args[5], args[6]).newline;
 
-  hostname = args[1].ptr;
+  hostname = args[1];
   port = atoi(args[2].ptr);
   exchange = args[3].ptr;
   routingkey = args[4].ptr;
   messagebody = args[5].ptr;
 
-  conn = amqp_new_connection();
+  socket = amqp_open_socket(hostname, port);
+  conn = amqp_new_connection(socket);
 
-  Stdout.format("{} {} {}", getString(hostname), port, conn).newline;
-
-  //  socket = new Socket(AddressFamily.INET, SocketType.STREAM, ProtocolType.IP, true);  
-
-  //  sockfd = socket.sock;
-
-  die_on_error(sockfd = amqp_open_socket(hostname, port), "Opening socket");
-
-  Stdout.format("main #1 {}", sockfd).newline;
-
-  amqp_set_sockfd(conn, sockfd);
+  Stdout.format("{} {} {}", hostname, port, conn).newline;
 
   Stdout.format("main #2 {}", conn).newline;
 
@@ -110,7 +101,8 @@ public static void main(char[][] args) {
   Stdout.format("main #9").newline;
   amqp_destroy_connection(conn);
   Stdout.format("main #10").newline;
-  die_on_error(close(cast(socket_t)sockfd), "Closing socket");
+
+  //die_on_error(close(cast(socket_t)sockfd), "Closing socket");
   Stdout.format("main #RETURN").newline;
   return 0;
 }
