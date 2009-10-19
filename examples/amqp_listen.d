@@ -3,6 +3,8 @@ import tango.stdc.stdio;
 import tango.stdc.stdlib;
 import tango.net.Socket;
 import tango.stdc.string : strlenn = strlen;
+import tango.stdc.stringz;
+
 
 import amqp_base;
 import amqp;
@@ -22,8 +24,8 @@ import example_utils;
 int main(char[][] args) {
   char[] hostname;
   int port;
-  char *exchange;
-  char *bindingkey;
+  char[] exchange;
+  char[] bindingkey;
 
   Socket socket;
   amqp_connection_state_t *conn;
@@ -37,15 +39,24 @@ int main(char[][] args) {
 
   hostname = args[1];
   port = atoi(args[2].ptr);
-  exchange = args[3].ptr;
-  bindingkey = args[4].ptr;
+  exchange = args[3];
+  bindingkey = args[4];
+
+  //Stdout.format("#1").newline;
 
   socket = amqp_open_socket(hostname, port);
 
+  //Stdout.format("#2").newline;
+
   conn = amqp_new_connection(socket);
+
+  //Stdout.format("#3").newline;
 
   die_on_amqp_error(amqp_login(conn, "test".ptr, 0, 131072, 0, amqp_sasl_method_enum.AMQP_SASL_METHOD_PLAIN, "user".ptr, "123".ptr),
 		    "Logging in");
+
+  //Stdout.format("#4").newline;
+
   amqp_channel_open(conn, 1);
   die_on_amqp_error(amqp_rpc_reply, "Opening channel");
 
@@ -59,7 +70,7 @@ int main(char[][] args) {
     }
   }
 
-  amqp_queue_bind(conn, 1, queuename, amqp_cstring_bytes(exchange), amqp_cstring_bytes(bindingkey),
+  amqp_queue_bind(conn, 1, queuename, amqp_cstring_bytes(toStringz(exchange)), amqp_cstring_bytes(toStringz(bindingkey)),
 		  AMQP_EMPTY_TABLE);
   die_on_amqp_error(amqp_rpc_reply, "Binding queue");
 
@@ -90,24 +101,24 @@ int main(char[][] args) {
       if (frame.payload.method.id != AMQP_BASIC_DELIVER_METHOD)
 	continue;
 
-      printf("main #1\n");
+      //printf("main #1\n");
 
       d = cast(amqp_basic_deliver_t *) frame.payload.method.decoded;
 
-      printf("main #2\n");
+      //printf("main #2\n");
 
-      Stdout.format("Delivery {}, exchange {} routingkey {}",
-		    cast(uint64_t) (*d).delivery_tag, getString(cast(char *) (*d).exchange.bytes, cast(uint) (*d).exchange.len),
-		    getString(cast(char *) (*d).routing_key.bytes, cast(uint) (*d).routing_key.len)).newline;
+      //Stdout.format("Delivery {}, exchange {} routingkey {}",
+      //		    cast(uint64_t) (*d).delivery_tag, getString(cast(char *) (*d).exchange.bytes, cast(uint) (*d).exchange.len),
+      //	    getString(cast(char *) (*d).routing_key.bytes, cast(uint) (*d).routing_key.len)).newline;
 
-      printf("main #3\n");
+      //printf("main #3\n");
 
       /*      printf("Delivery %u, exchange %.*s routingkey %.*s\n",
 	     cast(uint64_t) (*d).delivery_tag,
 	     cast(int) (*d).exchange.len, cast(char *) (*d).exchange.bytes,
 	     cast(int) (*d).routing_key.len, cast(char *) (*d).routing_key.bytes);*/
 
-      printf("main #4\n");
+      //printf("main #4\n");
 
       result = amqp_simple_wait_frame(conn, &frame);
       if (result <= 0)
@@ -144,7 +155,7 @@ int main(char[][] args) {
 		frame.payload.body_fragment.len);*/
 
 	Stdout.format("Content: \n{}", getString(cast(char *)frame.payload.body_fragment.bytes,
-						 frame.payload.body_fragment.len)).newline;
+					 frame.payload.body_fragment.len)).newline;
 
       }
 

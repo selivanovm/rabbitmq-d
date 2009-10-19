@@ -38,11 +38,11 @@ template RPC_REPLY(T)
 amqp_channel_open_ok_t *amqp_channel_open(amqp_connection_state_t *state,
 					  amqp_channel_t channel)
 {
-  Stdout.format("amqp_channel_open #START").newline;
+  //Stdout.format("amqp_channel_open #START").newline;
   amqp_channel_open_t acot = { AMQP_EMPTY_BYTES };
   amqp_rpc_reply = amqp_simple_rpc(state, channel, AMQP_CHANNEL_OPEN_METHOD, AMQP_CHANNEL_OPEN_OK_METHOD,
 				   cast(void*)&acot);
-  Stdout.format("amqp_channel_open #RETURN").newline;
+  //Stdout.format("amqp_channel_open #RETURN").newline;
   return RPC_REPLY!(amqp_channel_open_ok_t).resolve();
 }
 
@@ -56,7 +56,7 @@ int amqp_basic_publish(amqp_connection_state_t *state,
 		       amqp_bytes_t bo_dy)
 {
 
-  Stdout.format("amqp_basic_publish #START").newline;
+  //Stdout.format("amqp_basic_publish #START").newline;
 
   amqp_frame_t f;
   size_t body_offset;
@@ -74,7 +74,7 @@ int amqp_basic_publish(amqp_connection_state_t *state,
   if (result_ < 0)
     return result_;
 
-  Stdout.format("amqp_basic_publish #1").newline;
+  //Stdout.format("amqp_basic_publish #1").newline;
 
   if (properties is null) {
     memset(&default_properties, 0, default_properties.sizeof);
@@ -91,7 +91,7 @@ int amqp_basic_publish(amqp_connection_state_t *state,
   if (result_ < 0)
     return result_;
 
-  Stdout.format("amqp_basic_publish #2").newline;
+  //Stdout.format("amqp_basic_publish #2").newline;
 
   body_offset = 0;
   while (1) {
@@ -101,7 +101,7 @@ int amqp_basic_publish(amqp_connection_state_t *state,
     if (remaining == 0)
       break;
 
-    Stdout.format("amqp_basic_publish #3").newline;
+    //Stdout.format("amqp_basic_publish #3").newline;
 
     f.frame_type = AMQP_FRAME_BODY;
     f.channel = channel;
@@ -118,7 +118,7 @@ int amqp_basic_publish(amqp_connection_state_t *state,
       return result_;
 
   }
-  Stdout.format("amqp_basic_publish #RETURN").newline;
+  //Stdout.format("amqp_basic_publish #RETURN").newline;
   return 0;
 }
 

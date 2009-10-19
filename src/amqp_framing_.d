@@ -131,11 +131,11 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
   int table_result;
   uint8_t bit_buffer;
 
-  Stdout.format("amqp_decode_method #1  {}", methodNumber).newline;
+  //Stdout.format("amqp_decode_method #1  {}", methodNumber).newline;
 
   switch (methodNumber) {
     case AMQP_QUEUE_DECLARE_METHOD: {
-      Stdout.format("amqp_decode_method #2").newline;
+      //Stdout.format("amqp_decode_method #2").newline;
       amqp_queue_declare_t *m = cast(amqp_queue_declare_t *) amqp_pool_alloc(pool, amqp_queue_declare_t.sizeof);
       (*m).ticket = D_16(encoded, offset);
       offset += 2;
@@ -151,14 +151,14 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       (*m).auto_delete = (bit_buffer & (1 << 3)) ? 1 : 0;
       (*m).nowait = (bit_buffer & (1 << 4)) ? 1 : 0;
       table_result = amqp_decode_table(encoded, pool, &((*m).arguments), &offset);
-      Stdout.format("amqp_decode_method #22").newline;
+      //Stdout.format("amqp_decode_method #22").newline;
       if(table_result < 0)
 	return table_result;
       *decoded = m;
       return 0;
     }
     case AMQP_QUEUE_DECLARE_OK_METHOD: {
-      Stdout.format("amqp_decode_method #3").newline;
+      //Stdout.format("amqp_decode_method #3").newline;
       amqp_queue_declare_ok_t *m = cast(amqp_queue_declare_ok_t *) amqp_pool_alloc(pool, amqp_queue_declare_ok_t.sizeof);
       (*m).queue.len = D_8(encoded, offset);
       offset++;
@@ -172,7 +172,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_QUEUE_BIND_METHOD: {
-      Stdout.format("amqp_decode_method #4").newline;
+      //Stdout.format("amqp_decode_method #4").newline;
       amqp_queue_bind_t *m = cast(amqp_queue_bind_t *) amqp_pool_alloc(pool, amqp_queue_bind_t.sizeof);
       (*m).ticket = D_16(encoded, offset);
       offset += 2;
@@ -198,13 +198,13 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_QUEUE_BIND_OK_METHOD: {
-      Stdout.format("amqp_decode_method #5").newline;
+      //Stdout.format("amqp_decode_method #5").newline;
       amqp_queue_bind_ok_t *m = cast(amqp_queue_bind_ok_t *) amqp_pool_alloc(pool, amqp_queue_bind_ok_t.sizeof);
       *decoded = m;
       return 0;
     }
     case AMQP_QUEUE_PURGE_METHOD: {
-      Stdout.format("amqp_decode_method #6").newline;
+      //Stdout.format("amqp_decode_method #6").newline;
       amqp_queue_purge_t *m = cast(amqp_queue_purge_t *) amqp_pool_alloc(pool, amqp_queue_purge_t.sizeof);
       (*m).ticket = D_16(encoded, offset);
       offset += 2;
@@ -219,7 +219,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_QUEUE_PURGE_OK_METHOD: {
-      Stdout.format("amqp_decode_method #7").newline;
+      //Stdout.format("amqp_decode_method #7").newline;
       amqp_queue_purge_ok_t *m = cast(amqp_queue_purge_ok_t *) amqp_pool_alloc(pool, amqp_queue_purge_ok_t.sizeof);
       (*m).message_count = D_32(encoded, offset);
       offset += 4;
@@ -227,7 +227,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_QUEUE_DELETE_METHOD: {
-      Stdout.format("amqp_decode_method #8").newline;
+      //Stdout.format("amqp_decode_method #8").newline;
       amqp_queue_delete_t *m = cast(amqp_queue_delete_t *) amqp_pool_alloc(pool, amqp_queue_delete_t.sizeof);
       (*m).ticket = D_16(encoded, offset);
       offset += 2;
@@ -244,7 +244,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_QUEUE_DELETE_OK_METHOD: {
-      Stdout.format("amqp_decode_method #9").newline;
+      //Stdout.format("amqp_decode_method #9").newline;
       amqp_queue_delete_ok_t *m = cast(amqp_queue_delete_ok_t *) amqp_pool_alloc(pool, amqp_queue_delete_ok_t.sizeof);
       (*m).message_count = D_32(encoded, offset);
       offset += 4;
@@ -252,7 +252,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_QUEUE_UNBIND_METHOD: {
-      Stdout.format("amqp_decode_method #10").newline;
+      //Stdout.format("amqp_decode_method #10").newline;
       amqp_queue_unbind_t *m = cast(amqp_queue_unbind_t *) amqp_pool_alloc(pool, amqp_queue_unbind_t.sizeof);
       (*m).ticket = D_16(encoded, offset);
       offset += 2;
@@ -275,49 +275,49 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_QUEUE_UNBIND_OK_METHOD: {
-      Stdout.format("amqp_decode_method #11").newline;
+      //Stdout.format("amqp_decode_method #11").newline;
       amqp_queue_unbind_ok_t *m = cast(amqp_queue_unbind_ok_t *) amqp_pool_alloc(pool, amqp_queue_unbind_ok_t.sizeof);
       *decoded = m;
       return 0;
     }
     case AMQP_TX_SELECT_METHOD: {
-      Stdout.format("amqp_decode_method #12").newline;
+      //Stdout.format("amqp_decode_method #12").newline;
       amqp_tx_select_t *m = cast(amqp_tx_select_t *) amqp_pool_alloc(pool, amqp_tx_select_t.sizeof);
       *decoded = m;
       return 0;
     }
     case AMQP_TX_SELECT_OK_METHOD: {
-      Stdout.format("amqp_decode_method #13").newline;
+      //Stdout.format("amqp_decode_method #13").newline;
       amqp_tx_select_ok_t *m = cast(amqp_tx_select_ok_t *) amqp_pool_alloc(pool, amqp_tx_select_ok_t.sizeof);
       *decoded = m;
       return 0;
     }
     case AMQP_TX_COMMIT_METHOD: {
-      Stdout.format("amqp_decode_method #14").newline;
+      //Stdout.format("amqp_decode_method #14").newline;
       amqp_tx_commit_t *m = cast(amqp_tx_commit_t *) amqp_pool_alloc(pool, amqp_tx_commit_t.sizeof);
       *decoded = m;
       return 0;
     }
     case AMQP_TX_COMMIT_OK_METHOD: {
-      Stdout.format("amqp_decode_method #15").newline;
+      //Stdout.format("amqp_decode_method #15").newline;
       amqp_tx_commit_ok_t *m = cast(amqp_tx_commit_ok_t *) amqp_pool_alloc(pool, amqp_tx_commit_ok_t.sizeof);
       *decoded = m;
       return 0;
     }
     case AMQP_TX_ROLLBACK_METHOD: {
-      Stdout.format("amqp_decode_method #16").newline;
+      //Stdout.format("amqp_decode_method #16").newline;
       amqp_tx_rollback_t *m = cast(amqp_tx_rollback_t *) amqp_pool_alloc(pool, amqp_tx_rollback_t.sizeof);
       *decoded = m;
       return 0;
     }
     case AMQP_TX_ROLLBACK_OK_METHOD: {
-      Stdout.format("amqp_decode_method #17").newline;
+      //Stdout.format("amqp_decode_method #17").newline;
       amqp_tx_rollback_ok_t *m = cast(amqp_tx_rollback_ok_t *) amqp_pool_alloc(pool, amqp_tx_rollback_ok_t.sizeof);
       *decoded = m;
       return 0;
     }
     case AMQP_STREAM_QOS_METHOD: {
-      Stdout.format("amqp_decode_method #18").newline;
+      //Stdout.format("amqp_decode_method #18").newline;
       amqp_stream_qos_t *m = cast(amqp_stream_qos_t *) amqp_pool_alloc(pool, amqp_stream_qos_t.sizeof);
       (*m).prefetch_size = D_32(encoded, offset);
       offset += 4;
@@ -332,13 +332,13 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_STREAM_QOS_OK_METHOD: {
-      Stdout.format("amqp_decode_method #19").newline;
+      //Stdout.format("amqp_decode_method #19").newline;
       amqp_stream_qos_ok_t *m = cast(amqp_stream_qos_ok_t *) amqp_pool_alloc(pool, amqp_stream_qos_ok_t.sizeof);
       *decoded = m;
       return 0;
     }
     case AMQP_STREAM_CONSUME_METHOD: {
-      Stdout.format("amqp_decode_method #20").newline;
+      //Stdout.format("amqp_decode_method #20").newline;
       amqp_stream_consume_t *m = cast(amqp_stream_consume_t *) amqp_pool_alloc(pool, amqp_stream_consume_t.sizeof);
       (*m).ticket = D_16(encoded, offset);
       offset += 2;
@@ -359,7 +359,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_STREAM_CONSUME_OK_METHOD: {
-      Stdout.format("amqp_decode_method #21").newline;
+      //Stdout.format("amqp_decode_method #21").newline;
       amqp_stream_consume_ok_t *m = cast(amqp_stream_consume_ok_t *) amqp_pool_alloc(pool, amqp_stream_consume_ok_t.sizeof);
       (*m).consumer_tag.len = D_8(encoded, offset);
       offset++;
@@ -369,7 +369,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_STREAM_CANCEL_METHOD: {
-      Stdout.format("amqp_decode_method #22").newline;
+      //Stdout.format("amqp_decode_method #22").newline;
       amqp_stream_cancel_t *m = cast(amqp_stream_cancel_t *) amqp_pool_alloc(pool, amqp_stream_cancel_t.sizeof);
       (*m).consumer_tag.len = D_8(encoded, offset);
       offset++;
@@ -382,7 +382,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_STREAM_CANCEL_OK_METHOD: {
-      Stdout.format("amqp_decode_method #23").newline;
+      //Stdout.format("amqp_decode_method #23").newline;
       amqp_stream_cancel_ok_t *m = cast(amqp_stream_cancel_ok_t *) amqp_pool_alloc(pool, amqp_stream_cancel_ok_t.sizeof);
       (*m).consumer_tag.len = D_8(encoded, offset);
       offset++;
@@ -392,7 +392,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_STREAM_PUBLISH_METHOD: {
-      Stdout.format("amqp_decode_method #24").newline;
+      //Stdout.format("amqp_decode_method #24").newline;
       amqp_stream_publish_t *m = cast(amqp_stream_publish_t *) amqp_pool_alloc(pool, amqp_stream_publish_t.sizeof);
       (*m).ticket = D_16(encoded, offset);
       offset += 2;
@@ -412,7 +412,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_STREAM_RETURN_METHOD: {
-      Stdout.format("amqp_decode_method #25").newline;
+      //Stdout.format("amqp_decode_method #25").newline;
       amqp_stream_return_t *m = cast(amqp_stream_return_t *) amqp_pool_alloc(pool, amqp_stream_return_t.sizeof);
       (*m).reply_code = D_16(encoded, offset);
       offset += 2;
@@ -432,7 +432,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_STREAM_DELIVER_METHOD: {
-      Stdout.format("amqp_decode_method #26").newline;
+      //Stdout.format("amqp_decode_method #26").newline;
       amqp_stream_deliver_t *m = cast(amqp_stream_deliver_t *) amqp_pool_alloc(pool, amqp_stream_deliver_t.sizeof);
       (*m).consumer_tag.len = D_8(encoded, offset);
       offset++;
@@ -452,7 +452,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_EXCHANGE_DECLARE_METHOD: {
-      Stdout.format("amqp_decode_method #27").newline;
+      //Stdout.format("amqp_decode_method #27").newline;
       amqp_exchange_declare_t *m = cast(amqp_exchange_declare_t *) amqp_pool_alloc(pool, amqp_exchange_declare_t.sizeof);
       (*m).ticket = D_16(encoded, offset);
       offset += 2;
@@ -478,13 +478,13 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_EXCHANGE_DECLARE_OK_METHOD: {
-      Stdout.format("amqp_decode_method #28").newline;
+      //Stdout.format("amqp_decode_method #28").newline;
       amqp_exchange_declare_ok_t *m = cast(amqp_exchange_declare_ok_t *) amqp_pool_alloc(pool, amqp_exchange_declare_ok_t.sizeof);
       *decoded = m;
       return 0;
     }
     case AMQP_EXCHANGE_DELETE_METHOD: {
-      Stdout.format("amqp_decode_method #29").newline;
+      //Stdout.format("amqp_decode_method #29").newline;
       amqp_exchange_delete_t *m = cast(amqp_exchange_delete_t *) amqp_pool_alloc(pool, amqp_exchange_delete_t.sizeof);
       (*m).ticket = D_16(encoded, offset);
       offset += 2;
@@ -500,13 +500,13 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_EXCHANGE_DELETE_OK_METHOD: {
-      Stdout.format("amqp_decode_method #30").newline;
+      //Stdout.format("amqp_decode_method #30").newline;
       amqp_exchange_delete_ok_t *m = cast(amqp_exchange_delete_ok_t *) amqp_pool_alloc(pool, amqp_exchange_delete_ok_t.sizeof);
       *decoded = m;
       return 0;
     }
     case AMQP_TUNNEL_REQUEST_METHOD: {
-      Stdout.format("amqp_decode_method #31").newline;
+      //Stdout.format("amqp_decode_method #31").newline;
       amqp_tunnel_request_t *m = cast(amqp_tunnel_request_t *) amqp_pool_alloc(pool, amqp_tunnel_request_t.sizeof);
       table_result = amqp_decode_table(encoded, pool, &((*m).meta_data), &offset);
       if(table_result < 0)
@@ -515,7 +515,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_ACCESS_REQUEST_METHOD: {
-      Stdout.format("amqp_decode_method #32").newline;
+      //Stdout.format("amqp_decode_method #32").newline;
       amqp_access_request_t *m = cast(amqp_access_request_t *) amqp_pool_alloc(pool, amqp_access_request_t.sizeof);
       (*m).realm.len = D_8(encoded, offset);
       offset++;
@@ -532,7 +532,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_ACCESS_REQUEST_OK_METHOD: {
-      Stdout.format("amqp_decode_method #33").newline;
+      //Stdout.format("amqp_decode_method #33").newline;
       amqp_access_request_ok_t *m = cast(amqp_access_request_ok_t *) amqp_pool_alloc(pool, amqp_access_request_ok_t.sizeof);
       (*m).ticket = D_16(encoded, offset);
       offset += 2;
@@ -540,18 +540,18 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_CONNECTION_START_METHOD: {
-      Stdout.format("amqp_decode_method #33").newline;
+      //Stdout.format("amqp_decode_method #33").newline;
       amqp_connection_start_t *m = cast(amqp_connection_start_t *) amqp_pool_alloc(pool, amqp_connection_start_t.sizeof);
       (*m).version_major = D_8(encoded, offset);
       offset++;
       (*m).version_minor = D_8(encoded, offset);
       offset++;
       table_result = amqp_decode_table(encoded, pool, &((*m).server_properties), &offset);
-      Stdout.format("amqp_decode_method #331").newline;
+      //Stdout.format("amqp_decode_method #331").newline;
       if(table_result < 0)
 	return table_result;
 
-      Stdout.format("amqp_decode_method #332").newline;
+      //Stdout.format("amqp_decode_method #332").newline;
       (*m).mechanisms.len = D_32(encoded, offset);
       offset += 4;
       (*m).mechanisms.bytes = D_BYTES(encoded, offset, (*m).mechanisms.len);
@@ -561,11 +561,11 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       (*m).locales.bytes = D_BYTES(encoded, offset, (*m).locales.len);
       offset += (*m).locales.len;
       *decoded = m;
-      Stdout.format("amqp_decode_method #END1").newline;
+      //Stdout.format("amqp_decode_method #END1").newline;
       return 0;
     }
     case AMQP_CONNECTION_START_OK_METHOD: {
-      Stdout.format("amqp_decode_method #34").newline;
+      //Stdout.format("amqp_decode_method #34").newline;
       amqp_connection_start_ok_t *m = cast(amqp_connection_start_ok_t *) amqp_pool_alloc(pool, amqp_connection_start_ok_t.sizeof);
       table_result = amqp_decode_table(encoded, pool, &((*m).client_properties), &offset);
       if(table_result < 0)
@@ -586,7 +586,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_CONNECTION_SECURE_METHOD: {
-      Stdout.format("amqp_decode_method #35").newline;
+      //Stdout.format("amqp_decode_method #35").newline;
       amqp_connection_secure_t *m = cast(amqp_connection_secure_t *) amqp_pool_alloc(pool, amqp_connection_secure_t.sizeof);
       (*m).challenge.len = D_32(encoded, offset);
       offset += 4;
@@ -596,7 +596,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_CONNECTION_SECURE_OK_METHOD: {
-      Stdout.format("amqp_decode_method #35").newline;
+      //Stdout.format("amqp_decode_method #35").newline;
       amqp_connection_secure_ok_t *m = cast(amqp_connection_secure_ok_t *) amqp_pool_alloc(pool, amqp_connection_secure_ok_t.sizeof);
       (*m).response.len = D_32(encoded, offset);
       offset += 4;
@@ -606,7 +606,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_CONNECTION_TUNE_METHOD: {
-      Stdout.format("amqp_decode_method #36").newline;
+      //Stdout.format("amqp_decode_method #36").newline;
       amqp_connection_tune_t *m = cast(amqp_connection_tune_t *) amqp_pool_alloc(pool, amqp_connection_tune_t.sizeof);
       (*m).channel_max = D_16(encoded, offset);
       offset += 2;
@@ -618,7 +618,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_CONNECTION_TUNE_OK_METHOD: {
-      Stdout.format("amqp_decode_method #37").newline;
+      //Stdout.format("amqp_decode_method #37").newline;
       amqp_connection_tune_ok_t *m = cast(amqp_connection_tune_ok_t *) amqp_pool_alloc(pool, amqp_connection_tune_ok_t.sizeof);
       (*m).channel_max = D_16(encoded, offset);
       offset += 2;
@@ -630,7 +630,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_CONNECTION_OPEN_METHOD: {
-      Stdout.format("amqp_decode_method #38").newline;
+      //Stdout.format("amqp_decode_method #38").newline;
       amqp_connection_open_t *m = cast(amqp_connection_open_t *) amqp_pool_alloc(pool, amqp_connection_open_t.sizeof);
       (*m).virtual_host.len = D_8(encoded, offset);
       offset++;
@@ -647,7 +647,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_CONNECTION_OPEN_OK_METHOD: {
-      Stdout.format("amqp_decode_method #39").newline;
+      //Stdout.format("amqp_decode_method #39").newline;
       amqp_connection_open_ok_t *m = cast(amqp_connection_open_ok_t *) amqp_pool_alloc(pool, amqp_connection_open_ok_t.sizeof);
       (*m).known_hosts.len = D_8(encoded, offset);
       offset++;
@@ -657,7 +657,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_CONNECTION_REDIRECT_METHOD: {
-      Stdout.format("amqp_decode_method #40").newline;
+      //Stdout.format("amqp_decode_method #40").newline;
       amqp_connection_redirect_t *m = cast(amqp_connection_redirect_t *) amqp_pool_alloc(pool, amqp_connection_redirect_t.sizeof);
       (*m).host.len = D_8(encoded, offset);
       offset++;
@@ -671,7 +671,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_CONNECTION_CLOSE_METHOD: {
-      Stdout.format("amqp_decode_method #41").newline;
+      //Stdout.format("amqp_decode_method #41").newline;
       amqp_connection_close_t *m = cast(amqp_connection_close_t *) amqp_pool_alloc(pool, amqp_connection_close_t.sizeof);
       (*m).reply_code = D_16(encoded, offset);
       offset += 2;
@@ -687,25 +687,25 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_CONNECTION_CLOSE_OK_METHOD: {
-      Stdout.format("amqp_decode_method #42").newline;
+      //Stdout.format("amqp_decode_method #42").newline;
       amqp_connection_close_ok_t *m = cast(amqp_connection_close_ok_t *) amqp_pool_alloc(pool, amqp_connection_close_ok_t.sizeof);
       *decoded = m;
       return 0;
     }
     case AMQP_DTX_SELECT_METHOD: {
-      Stdout.format("amqp_decode_method #43").newline;
+      //Stdout.format("amqp_decode_method #43").newline;
       amqp_dtx_select_t *m = cast(amqp_dtx_select_t *) amqp_pool_alloc(pool, amqp_dtx_select_t.sizeof);
       *decoded = m;
       return 0;
     }
     case AMQP_DTX_SELECT_OK_METHOD: {
-      Stdout.format("amqp_decode_method #44").newline;
+      //Stdout.format("amqp_decode_method #44").newline;
       amqp_dtx_select_ok_t *m = cast(amqp_dtx_select_ok_t *) amqp_pool_alloc(pool, amqp_dtx_select_ok_t.sizeof);
       *decoded = m;
       return 0;
     }
     case AMQP_DTX_START_METHOD: {
-      Stdout.format("amqp_decode_method #45").newline;
+      //Stdout.format("amqp_decode_method #45").newline;
       amqp_dtx_start_t *m = cast(amqp_dtx_start_t *) amqp_pool_alloc(pool, amqp_dtx_start_t.sizeof);
       (*m).dtx_identifier.len = D_8(encoded, offset);
       offset++;
@@ -715,13 +715,13 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_DTX_START_OK_METHOD: {
-      Stdout.format("amqp_decode_method #46").newline;
+      //Stdout.format("amqp_decode_method #46").newline;
       amqp_dtx_start_ok_t *m = cast(amqp_dtx_start_ok_t *) amqp_pool_alloc(pool, amqp_dtx_start_ok_t.sizeof);
       *decoded = m;
       return 0;
     }
     case AMQP_FILE_QOS_METHOD: {
-      Stdout.format("amqp_decode_method #47").newline;
+      //Stdout.format("amqp_decode_method #47").newline;
       amqp_file_qos_t *m = cast(amqp_file_qos_t *) amqp_pool_alloc(pool, amqp_file_qos_t.sizeof);
       (*m).prefetch_size = D_32(encoded, offset);
       offset += 4;
@@ -734,13 +734,13 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_FILE_QOS_OK_METHOD: {
-      Stdout.format("amqp_decode_method #48").newline;
+      //Stdout.format("amqp_decode_method #48").newline;
       amqp_file_qos_ok_t *m = cast(amqp_file_qos_ok_t *) amqp_pool_alloc(pool, amqp_file_qos_ok_t.sizeof);
       *decoded = m;
       return 0;
     }
     case AMQP_FILE_CONSUME_METHOD: {
-      Stdout.format("amqp_decode_method #49").newline;
+      //Stdout.format("amqp_decode_method #49").newline;
       amqp_file_consume_t *m = cast(amqp_file_consume_t *) amqp_pool_alloc(pool, amqp_file_consume_t.sizeof);
       (*m).ticket = D_16(encoded, offset);
       offset += 2;
@@ -762,7 +762,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_FILE_CONSUME_OK_METHOD: {
-      Stdout.format("amqp_decode_method #50").newline;
+      //Stdout.format("amqp_decode_method #50").newline;
       amqp_file_consume_ok_t *m = cast(amqp_file_consume_ok_t *) amqp_pool_alloc(pool, amqp_file_consume_ok_t.sizeof);
       (*m).consumer_tag.len = D_8(encoded, offset);
       offset++;
@@ -772,7 +772,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_FILE_CANCEL_METHOD: {
-      Stdout.format("amqp_decode_method #51").newline;
+      //Stdout.format("amqp_decode_method #51").newline;
       amqp_file_cancel_t *m = cast(amqp_file_cancel_t *) amqp_pool_alloc(pool, amqp_file_cancel_t.sizeof);
       (*m).consumer_tag.len = D_8(encoded, offset);
       offset++;
@@ -785,7 +785,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_FILE_CANCEL_OK_METHOD: {
-      Stdout.format("amqp_decode_method #52").newline;
+      //Stdout.format("amqp_decode_method #52").newline;
       amqp_file_cancel_ok_t *m = cast(amqp_file_cancel_ok_t *) amqp_pool_alloc(pool, amqp_file_cancel_ok_t.sizeof);
       (*m).consumer_tag.len = D_8(encoded, offset);
       offset++;
@@ -795,7 +795,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_FILE_OPEN_METHOD: {
-      Stdout.format("amqp_decode_method #53").newline;
+      //Stdout.format("amqp_decode_method #53").newline;
       amqp_file_open_t *m = cast(amqp_file_open_t *) amqp_pool_alloc(pool, amqp_file_open_t.sizeof);
       (*m).identifier.len = D_8(encoded, offset);
       offset++;
@@ -807,7 +807,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_FILE_OPEN_OK_METHOD: {
-      Stdout.format("amqp_decode_method #54").newline;
+      //Stdout.format("amqp_decode_method #54").newline;
       amqp_file_open_ok_t *m = cast(amqp_file_open_ok_t *) amqp_pool_alloc(pool, amqp_file_open_ok_t.sizeof);
       (*m).staged_size = D_64(encoded, offset);
       offset += 8;
@@ -815,13 +815,13 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_FILE_STAGE_METHOD: {
-      Stdout.format("amqp_decode_method #55").newline;
+      //Stdout.format("amqp_decode_method #55").newline;
       amqp_file_stage_t *m = cast(amqp_file_stage_t *) amqp_pool_alloc(pool, amqp_file_stage_t.sizeof);
       *decoded = m;
       return 0;
     }
     case AMQP_FILE_PUBLISH_METHOD: {
-      Stdout.format("amqp_decode_method #56").newline;
+      //Stdout.format("amqp_decode_method #56").newline;
       amqp_file_publish_t *m = cast(amqp_file_publish_t *) amqp_pool_alloc(pool, amqp_file_publish_t.sizeof);
       (*m).ticket = D_16(encoded, offset);
       offset += 2;
@@ -845,7 +845,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_FILE_RETURN_METHOD: {
-      Stdout.format("amqp_decode_method #57").newline;
+      //Stdout.format("amqp_decode_method #57").newline;
       amqp_file_return_t *m = cast(amqp_file_return_t *) amqp_pool_alloc(pool, amqp_file_return_t.sizeof);
       (*m).reply_code = D_16(encoded, offset);
       offset += 2;
@@ -865,7 +865,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_FILE_DELIVER_METHOD: {
-      Stdout.format("amqp_decode_method #58").newline;
+      //Stdout.format("amqp_decode_method #58").newline;
       amqp_file_deliver_t *m = cast(amqp_file_deliver_t *) amqp_pool_alloc(pool, amqp_file_deliver_t.sizeof);
       (*m).consumer_tag.len = D_8(encoded, offset);
       offset++;
@@ -892,7 +892,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_FILE_ACK_METHOD: {
-      Stdout.format("amqp_decode_method #59").newline;
+      //Stdout.format("amqp_decode_method #59").newline;
       amqp_file_ack_t *m = cast(amqp_file_ack_t *) amqp_pool_alloc(pool, amqp_file_ack_t.sizeof);
       (*m).delivery_tag = D_64(encoded, offset);
       offset += 8;
@@ -903,7 +903,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_FILE_REJECT_METHOD: {
-      Stdout.format("amqp_decode_method #60").newline;
+      //Stdout.format("amqp_decode_method #60").newline;
       amqp_file_reject_t *m = cast(amqp_file_reject_t *) amqp_pool_alloc(pool, amqp_file_reject_t.sizeof);
       (*m).delivery_tag = D_64(encoded, offset);
       offset += 8;
@@ -914,7 +914,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_BASIC_QOS_METHOD: {
-      Stdout.format("amqp_decode_method #61").newline;
+      //Stdout.format("amqp_decode_method #61").newline;
       amqp_basic_qos_t *m = cast(amqp_basic_qos_t *) amqp_pool_alloc(pool, amqp_basic_qos_t.sizeof);
       (*m).prefetch_size = D_32(encoded, offset);
       offset += 4;
@@ -927,13 +927,13 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_BASIC_QOS_OK_METHOD: {
-      Stdout.format("amqp_decode_method #62").newline;
+      //Stdout.format("amqp_decode_method #62").newline;
       amqp_basic_qos_ok_t *m = cast(amqp_basic_qos_ok_t *) amqp_pool_alloc(pool, amqp_basic_qos_ok_t.sizeof);
       *decoded = m;
       return 0;
     }
     case AMQP_BASIC_CONSUME_METHOD: {
-      Stdout.format("amqp_decode_method #63").newline;
+      //Stdout.format("amqp_decode_method #63").newline;
       amqp_basic_consume_t *m = cast(amqp_basic_consume_t *) amqp_pool_alloc(pool, amqp_basic_consume_t.sizeof);
       (*m).ticket = D_16(encoded, offset);
       offset += 2;
@@ -955,7 +955,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_BASIC_CONSUME_OK_METHOD: {
-      Stdout.format("amqp_decode_method #64").newline;
+      //Stdout.format("amqp_decode_method #64").newline;
       amqp_basic_consume_ok_t *m = cast(amqp_basic_consume_ok_t *) amqp_pool_alloc(pool, amqp_basic_consume_ok_t.sizeof);
       (*m).consumer_tag.len = D_8(encoded, offset);
       offset++;
@@ -965,7 +965,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_BASIC_CANCEL_METHOD: {
-      Stdout.format("amqp_decode_method #65").newline;
+      //Stdout.format("amqp_decode_method #65").newline;
       amqp_basic_cancel_t *m = cast(amqp_basic_cancel_t *) amqp_pool_alloc(pool, amqp_basic_cancel_t.sizeof);
       (*m).consumer_tag.len = D_8(encoded, offset);
       offset++;
@@ -978,7 +978,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_BASIC_CANCEL_OK_METHOD: {
-      Stdout.format("amqp_decode_method #66").newline;
+      //Stdout.format("amqp_decode_method #66").newline;
       amqp_basic_cancel_ok_t *m = cast(amqp_basic_cancel_ok_t *) amqp_pool_alloc(pool, amqp_basic_cancel_ok_t.sizeof);
       (*m).consumer_tag.len = D_8(encoded, offset);
       offset++;
@@ -988,7 +988,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_BASIC_PUBLISH_METHOD: {
-      Stdout.format("amqp_decode_method #67").newline;
+      //Stdout.format("amqp_decode_method #67").newline;
       amqp_basic_publish_t *m = cast(amqp_basic_publish_t *) amqp_pool_alloc(pool, amqp_basic_publish_t.sizeof);
       (*m).ticket = D_16(encoded, offset);
       offset += 2;
@@ -1008,7 +1008,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_BASIC_RETURN_METHOD: {
-      Stdout.format("amqp_decode_method #68").newline;
+      //Stdout.format("amqp_decode_method #68").newline;
       amqp_basic_return_t *m = cast(amqp_basic_return_t *) amqp_pool_alloc(pool, amqp_basic_return_t.sizeof);
       (*m).reply_code = D_16(encoded, offset);
       offset += 2;
@@ -1028,7 +1028,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_BASIC_DELIVER_METHOD: {
-      Stdout.format("amqp_decode_method #69").newline;
+      //Stdout.format("amqp_decode_method #69").newline;
       amqp_basic_deliver_t *m = cast(amqp_basic_deliver_t *) amqp_pool_alloc(pool, amqp_basic_deliver_t.sizeof);
       (*m).consumer_tag.len = D_8(encoded, offset);
       offset++;
@@ -1051,7 +1051,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_BASIC_GET_METHOD: {
-      Stdout.format("amqp_decode_method #70").newline;
+      //Stdout.format("amqp_decode_method #70").newline;
       amqp_basic_get_t *m = cast(amqp_basic_get_t *) amqp_pool_alloc(pool, amqp_basic_get_t.sizeof);
       (*m).ticket = D_16(encoded, offset);
       offset += 2;
@@ -1066,7 +1066,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_BASIC_GET_OK_METHOD: {
-      Stdout.format("amqp_decode_method #71").newline;
+      //Stdout.format("amqp_decode_method #71").newline;
       amqp_basic_get_ok_t *m = cast(amqp_basic_get_ok_t *) amqp_pool_alloc(pool, amqp_basic_get_ok_t.sizeof);
       (*m).delivery_tag = D_64(encoded, offset);
       offset += 8;
@@ -1087,7 +1087,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_BASIC_GET_EMPTY_METHOD: {
-      Stdout.format("amqp_decode_method #72").newline;
+      //Stdout.format("amqp_decode_method #72").newline;
       amqp_basic_get_empty_t *m = cast(amqp_basic_get_empty_t *) amqp_pool_alloc(pool, amqp_basic_get_empty_t.sizeof);
       (*m).cluster_id.len = D_8(encoded, offset);
       offset++;
@@ -1097,7 +1097,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_BASIC_ACK_METHOD: {
-      Stdout.format("amqp_decode_method #73").newline;
+      //Stdout.format("amqp_decode_method #73").newline;
       amqp_basic_ack_t *m = cast(amqp_basic_ack_t *) amqp_pool_alloc(pool, amqp_basic_ack_t.sizeof);
       (*m).delivery_tag = D_64(encoded, offset);
       offset += 8;
@@ -1108,7 +1108,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_BASIC_REJECT_METHOD: {
-      Stdout.format("amqp_decode_method #74").newline;
+      //Stdout.format("amqp_decode_method #74").newline;
       amqp_basic_reject_t *m = cast(amqp_basic_reject_t *) amqp_pool_alloc(pool, amqp_basic_reject_t.sizeof);
       (*m).delivery_tag = D_64(encoded, offset);
       offset += 8;
@@ -1119,7 +1119,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_BASIC_RECOVER_METHOD: {
-      Stdout.format("amqp_decode_method #75").newline;
+      //Stdout.format("amqp_decode_method #75").newline;
       amqp_basic_recover_t *m = cast(amqp_basic_recover_t *) amqp_pool_alloc(pool, amqp_basic_recover_t.sizeof);
       bit_buffer = D_8(encoded, offset);
       offset++;
@@ -1128,7 +1128,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_TEST_INTEGER_METHOD: {
-      Stdout.format("amqp_decode_method #76").newline;
+      //Stdout.format("amqp_decode_method #76").newline;
       amqp_test_integer_t *m = cast(amqp_test_integer_t *) amqp_pool_alloc(pool, amqp_test_integer_t.sizeof);
       (*m).integer_1 = D_8(encoded, offset);
       offset++;
@@ -1144,7 +1144,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_TEST_INTEGER_OK_METHOD: {
-      Stdout.format("amqp_decode_method #77").newline;
+      //Stdout.format("amqp_decode_method #77").newline;
       amqp_test_integer_ok_t *m = cast(amqp_test_integer_ok_t *) amqp_pool_alloc(pool, amqp_test_integer_ok_t.sizeof);
       (*m).result = D_64(encoded, offset);
       offset += 8;
@@ -1152,7 +1152,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_TEST_STRING_METHOD: {
-      Stdout.format("amqp_decode_method #78").newline;
+      //Stdout.format("amqp_decode_method #78").newline;
       amqp_test_string_t *m = cast(amqp_test_string_t *) amqp_pool_alloc(pool, amqp_test_string_t.sizeof);
       (*m).string_1.len = D_8(encoded, offset);
       offset++;
@@ -1168,7 +1168,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_TEST_STRING_OK_METHOD: {
-      Stdout.format("amqp_decode_method #79").newline;
+      //Stdout.format("amqp_decode_method #79").newline;
       amqp_test_string_ok_t *m = cast(amqp_test_string_ok_t *) amqp_pool_alloc(pool, amqp_test_string_ok_t.sizeof);
       (*m).result.len = D_32(encoded, offset);
       offset += 4;
@@ -1178,7 +1178,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_TEST_TABLE_METHOD: {
-      Stdout.format("amqp_decode_method #80").newline;
+      //Stdout.format("amqp_decode_method #80").newline;
       amqp_test_table_t *m = cast(amqp_test_table_t *) amqp_pool_alloc(pool, amqp_test_table_t.sizeof);
       table_result = amqp_decode_table(encoded, pool, &((*m).table), &offset);
       if(table_result < 0)
@@ -1191,7 +1191,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_TEST_TABLE_OK_METHOD: {
-      Stdout.format("amqp_decode_method #81").newline;
+      //Stdout.format("amqp_decode_method #81").newline;
       amqp_test_table_ok_t *m = cast(amqp_test_table_ok_t *) amqp_pool_alloc(pool, amqp_test_table_ok_t.sizeof);
       (*m).integer_result = D_64(encoded, offset);
       offset += 8;
@@ -1203,13 +1203,13 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_TEST_CONTENT_METHOD: {
-      Stdout.format("amqp_decode_method #2").newline;
+      //Stdout.format("amqp_decode_method #2").newline;
       amqp_test_content_t *m = cast(amqp_test_content_t *) amqp_pool_alloc(pool, amqp_test_content_t.sizeof);
       *decoded = m;
       return 0;
     }
     case AMQP_TEST_CONTENT_OK_METHOD: {
-      Stdout.format("amqp_decode_method #2").newline;
+      //Stdout.format("amqp_decode_method #2").newline;
       amqp_test_content_ok_t *m = cast(amqp_test_content_ok_t *) amqp_pool_alloc(pool, amqp_test_content_ok_t.sizeof);
       (*m).content_checksum = D_32(encoded, offset);
       offset += 4;
@@ -1217,7 +1217,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_CHANNEL_OPEN_METHOD: {
-      Stdout.format("amqp_decode_method #2").newline;
+      //Stdout.format("amqp_decode_method #2").newline;
       amqp_channel_open_t *m = cast(amqp_channel_open_t *) amqp_pool_alloc(pool, amqp_channel_open_t.sizeof);
       (*m).out_of_band.len = D_8(encoded, offset);
       offset++;
@@ -1227,13 +1227,13 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_CHANNEL_OPEN_OK_METHOD: {
-      Stdout.format("amqp_decode_method #2").newline;
+      //Stdout.format("amqp_decode_method #2").newline;
       amqp_channel_open_ok_t *m = cast(amqp_channel_open_ok_t *) amqp_pool_alloc(pool, amqp_channel_open_ok_t.sizeof);
       *decoded = m;
       return 0;
     }
     case AMQP_CHANNEL_FLOW_METHOD: {
-      Stdout.format("amqp_decode_method #2").newline;
+      //Stdout.format("amqp_decode_method #2").newline;
       amqp_channel_flow_t *m = cast(amqp_channel_flow_t *) amqp_pool_alloc(pool, amqp_channel_flow_t.sizeof);
       bit_buffer = D_8(encoded, offset);
       offset++;
@@ -1242,7 +1242,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_CHANNEL_FLOW_OK_METHOD: {
-      Stdout.format("amqp_decode_method #2").newline;
+      //Stdout.format("amqp_decode_method #2").newline;
       amqp_channel_flow_ok_t *m = cast(amqp_channel_flow_ok_t *) amqp_pool_alloc(pool, amqp_channel_flow_ok_t.sizeof);
       bit_buffer = D_8(encoded, offset);
       offset++;
@@ -1251,7 +1251,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_CHANNEL_ALERT_METHOD: {
-      Stdout.format("amqp_decode_method #2").newline;
+      //Stdout.format("amqp_decode_method #2").newline;
       amqp_channel_alert_t *m = cast(amqp_channel_alert_t *) amqp_pool_alloc(pool, amqp_channel_alert_t.sizeof);
       (*m).reply_code = D_16(encoded, offset);
       offset += 2;
@@ -1266,7 +1266,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_CHANNEL_CLOSE_METHOD: {
-      Stdout.format("amqp_decode_method #2").newline;
+      //Stdout.format("amqp_decode_method #2").newline;
       amqp_channel_close_t *m = cast(amqp_channel_close_t *) amqp_pool_alloc(pool, amqp_channel_close_t.sizeof);
       (*m).reply_code = D_16(encoded, offset);
       offset += 2;
@@ -1282,7 +1282,7 @@ int amqp_decode_method(amqp_method_number_t methodNumber,
       return 0;
     }
     case AMQP_CHANNEL_CLOSE_OK_METHOD: {
-      Stdout.format("amqp_decode_method #2").newline;
+      //Stdout.format("amqp_decode_method #2").newline;
       amqp_channel_close_ok_t *m = cast(amqp_channel_close_ok_t *) amqp_pool_alloc(pool, amqp_channel_close_ok_t.sizeof);
       *decoded = m;
       return 0;
@@ -1571,7 +1571,7 @@ int amqp_encode_method(amqp_method_number_t methodNumber,
   int table_result;
   uint8_t bit_buffer;
 
-  Stdout.format("amqp_encode_method methodNumber = {}", methodNumber).newline;
+  //Stdout.format("amqp_encode_method methodNumber = {}", methodNumber).newline;
 
   switch (methodNumber) {
     case AMQP_QUEUE_DECLARE_METHOD: {

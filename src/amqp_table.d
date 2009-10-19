@@ -15,7 +15,7 @@ int amqp_decode_table(amqp_bytes_t encoded,
 		      int *offsetptr)
 {
 
-  Stdout.format("amqp_decode_table #1").newline;
+  //Stdout.format("amqp_decode_table #1").newline;
 
   int result_ = -1;
 
@@ -33,7 +33,7 @@ int amqp_decode_table(amqp_bytes_t encoded,
   offset += 4;
   limit = offset + tablesize;
 
-  Stdout.format("amqp_decode_table #2").newline;
+  //Stdout.format("amqp_decode_table #2").newline;
 
   while (offset < limit) {
     size_t keylen;
@@ -54,7 +54,7 @@ int amqp_decode_table(amqp_bytes_t encoded,
     }
     entry = &entries[num_entries];
 
-    Stdout.format("amqp_decode_table #3").newline;
+    //Stdout.format("amqp_decode_table #3").newline;
 
     (*entry).key.len = keylen;
     (*entry).key.bytes = D_BYTES(encoded, offset, keylen);
@@ -96,14 +96,14 @@ int amqp_decode_table(amqp_bytes_t encoded,
     num_entries++;
   }
 
-  Stdout.format("amqp_decode_table #4").newline;
+  //Stdout.format("amqp_decode_table #4").newline;
 
   (*output).num_entries = num_entries;
   (*output).entries = cast(amqp_table_entry_t *)amqp_pool_alloc(pool, num_entries * amqp_table_entry_t.sizeof);
   memcpy((*output).entries, entries, num_entries * amqp_table_entry_t.sizeof);
 
   *offsetptr = offset;
-  Stdout.format("amqp_decode_table #5").newline;
+  //Stdout.format("amqp_decode_table #5").newline;
   return 0;
 }
 

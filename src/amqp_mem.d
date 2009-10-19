@@ -5,22 +5,6 @@ import tango.stdc.stdlib;
 import tango.io.Stdout;
 import tango.stdc.errno;
 
-/***#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdint.h>
-#include <sys/types.h>
-#include <errno.h>
-#include <assert.h>
-
-#include "amqp.h"
-#include "../config.h"
-
-char const *amqp_version(void) {
-  return VERSION; 
-}
-*/
-
 void init_amqp_pool(amqp_pool_t *pool, size_t pagesize) {
   (*pool).pagesize = pagesize ? pagesize : 4096;
 
@@ -129,11 +113,11 @@ void *amqp_pool_alloc(amqp_pool_t *pool, size_t amount) {
 }
 
 void amqp_pool_alloc_bytes(amqp_pool_t *pool, size_t amount, amqp_bytes_t *output) {
-  Stdout.format("amqp_pool_alloc_bytes #1").newline;
+  //Stdout.format("amqp_pool_alloc_bytes #1").newline;
 
   (*output).len = amount;
   (*output).bytes = amqp_pool_alloc(pool, amount);
-  Stdout.format("amqp_pool_alloc_bytes #2").newline;
+  //Stdout.format("amqp_pool_alloc_bytes #2").newline;
 }
 
 amqp_bytes_t amqp_cstring_bytes(char *cstr) {
