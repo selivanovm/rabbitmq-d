@@ -57,11 +57,11 @@ void die_on_amqp_error(amqp_rpc_reply_t x, char *context) {
   exit(1);
 }
 
-ulong now_microseconds() {
+/*ulong now_microseconds() {
   timeval tv;
   gettimeofday(&tv, null);
   return cast(ulong) tv.tv_sec * 1000000 + cast(ulong) tv.tv_usec;
-}
+}*/
 
 char[] getString(char* s, uint l) {
   char[] result = new char[l];

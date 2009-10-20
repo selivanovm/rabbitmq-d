@@ -2,7 +2,7 @@ import tango.stdc.stdarg;
 import tango.net.Socket;
 import tango.net.InternetAddress;
 import tango.stdc.string : strlenn = strlen, memcpy, memset;
-import tango.stdc.posix.arpa.inet : htons;
+//import tango.stdc.posix.arpa.inet : htons;
 import tango.stdc.stdlib;
 import tango.io.Stdout;
 
@@ -351,7 +351,7 @@ static int amqp_login_inner(amqp_connection_state_t *state,
     amqp_connection_start_t *s = cast(amqp_connection_start_t *) method.decoded;
     if ((s.version_major != AMQP_PROTOCOL_VERSION_MAJOR) ||
 	(s.version_minor != AMQP_PROTOCOL_VERSION_MINOR)) {
-      return -EPROTOTYPE;
+      return -EINVAL;
     }
 
     /* TODO: check that our chosen SASL mechanism is in the list of
