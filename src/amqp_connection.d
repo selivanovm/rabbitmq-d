@@ -223,7 +223,7 @@ int amqp_handle_input(amqp_connection_state_t *state,
       goto read_more;
     }
     case amqp_connection_state_enum.CONNECTION_STATE_WAITING_FOR_BODY: {
-      //Stdout.format("amqp_handle_input #8").newline;
+
       int frame_type = D_8((*state).inbound_buffer, 0);
 
       /*#if 0
