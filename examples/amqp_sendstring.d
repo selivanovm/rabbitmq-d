@@ -28,6 +28,7 @@
 //
 // Contributor(s): Mikhail Selivanov(Magnetosoft LLC).       
 //
+private import tango.core.Thread;
 import tango.io.Stdout;
 import tango.stdc.stdio;
 import tango.stdc.stdlib;
@@ -53,13 +54,15 @@ public static void main(char[][] args) {
   char[] exchange;
   char[] routingkey;
   char[] messagebody;
+  int multiplier;
+  int send_count;
 
   Socket socket;
 
   amqp_connection_state_t *conn;
 
-  if (args.length < 6) {
-    fprintf(stderr, "Usage: amqp_sendstring host port exchange routingkey messagebody\n");
+  if (args.length < 8) {
+    fprintf(stderr, "Usage: amqp_sendstring host port exchange routingkey messagebody multiplier send_count\n");
     return 1;
   }
 
@@ -70,37 +73,41 @@ public static void main(char[][] args) {
   exchange = args[3];
   routingkey = args[4];
   messagebody = args[5];
+  multiplier = atoi(args[6].ptr);
+  send_count = atoi(args[7].ptr);
+
+  char[] msg_arr = new char[multiplier * messagebody.length];
+
+  int l = 0;
+  for(int i = 0; i < multiplier; i++) {
+	  for(int j = 0; j < messagebody.length; j++) {
+		  msg_arr[l++] = messagebody[j];
+	  }
+  }
 
   socket = amqp_open_socket(hostname, port);
   conn = amqp_new_connection(socket);
 
-  //Stdout.format("{} {} {}", hostname, port, conn).newline;
-
-  //Stdout.format("main #2 {}", conn).newline;
-
-  die_on_amqp_error(amqp_login(conn, toStringz("test"), 0, 131072, 0, amqp_sasl_method_enum.AMQP_SASL_METHOD_PLAIN, toStringz("user"), toStringz("123")),
+  die_on_amqp_error(amqp_login(conn, toStringz("test"), 0, 131072, 0, amqp_sasl_method_enum.AMQP_SASL_METHOD_PLAIN, toStringz("test"), toStringz("test")),
 		    "Logging in");
-
-  //Stdout.format("main #3").newline;
 
   amqp_channel_open(conn, 1);
 
-  //Stdout.format("main #4").newline;
-
   die_on_amqp_error(amqp_rpc_reply, "Opening channel");
-
-  //Stdout.format("main #5").newline;
 
   amqp_exchange_declare(conn, 1, amqp_cstring_bytes(toStringz(exchange)), amqp_cstring_bytes("direct"),
 			0, 0, 0, AMQP_EMPTY_TABLE);
 
 
+
+  bool a = false;
+  for(int i = 0; i < send_count; i++)
   {
     amqp_basic_properties_t props;
     props._flags = AMQP_BASIC_CONTENT_TYPE_FLAG | AMQP_BASIC_DELIVERY_MODE_FLAG;
     props.content_type = amqp_cstring_bytes("text/plain");
     props.delivery_mode = 2; // persistent delivery mode
-    //Stdout.format("main #6").newline;
+    Stdout.format("amqp_sendstring : connection = {}", conn).newline;
     die_on_error(amqp_basic_publish(conn,
 				    1,
 				    amqp_cstring_bytes(toStringz(exchange)),
@@ -108,21 +115,20 @@ public static void main(char[][] args) {
 				    0,
 				    0,
 				    &props,
-				    amqp_cstring_bytes(toStringz(messagebody))),
+				    amqp_cstring_bytes(toStringz(msg_arr))),
 		 "Publishing");
+
+    Stdout.format("\n{} messages sent : socket = {}", i + 1, socket is null).newline;
+	  
+    if(i + 2 == send_count) {
+	    Thread.sleep(1);
+    }
   }
 
-  //Stdout.format("main #7").newline;
-
   die_on_amqp_error(amqp_channel_close(conn, 1, AMQP_REPLY_SUCCESS), "Closing channel");
-  //Stdout.format("main #8").newline;
   die_on_amqp_error(amqp_connection_close(conn, AMQP_REPLY_SUCCESS), "Closing connection");
-  //Stdout.format("main #9").newline;
   amqp_destroy_connection(conn);
-  //Stdout.format("main #10").newline;
 
-  //die_on_error(close(cast(socket_t)sockfd), "Closing socket");
-  //Stdout.format("main #RETURN").newline;
   return 0;
 }
 

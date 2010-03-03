@@ -82,7 +82,7 @@ int main(char[][] args) {
 
   //Stdout.format("#3").newline;
 
-  die_on_amqp_error(amqp_login(conn, "test".ptr, 0, 131072, 0, amqp_sasl_method_enum.AMQP_SASL_METHOD_PLAIN, "user".ptr, "123".ptr),
+  die_on_amqp_error(amqp_login(conn, "test".ptr, 0, 131072, 0, amqp_sasl_method_enum.AMQP_SASL_METHOD_PLAIN, "test".ptr, "test".ptr),
 		    "Logging in");
 
   //Stdout.format("#4").newline;
