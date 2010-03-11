@@ -88,7 +88,7 @@ public static void main(char[][] args) {
   socket = amqp_open_socket(hostname, port);
   conn = amqp_new_connection(socket);
 
-  die_on_amqp_error(amqp_login(conn, toStringz("test"), 0, 131072, 0, amqp_sasl_method_enum.AMQP_SASL_METHOD_PLAIN, toStringz("test"), toStringz("test")),
+  die_on_amqp_error(amqp_login(conn, toStringz("big-archive"), 0, 131072, 0, amqp_sasl_method_enum.AMQP_SASL_METHOD_PLAIN, toStringz("test"), toStringz("test")),
 		    "Logging in");
 
   amqp_channel_open(conn, 1);

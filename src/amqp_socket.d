@@ -154,30 +154,30 @@ amqp_boolean_t amqp_frames_enqueued(amqp_connection_state_t state) {
 static int wait_frame_inner(amqp_connection_state_t *state,
 			    amqp_frame_t *decoded_frame)
 {
-	//	log.trace("#wait_frame_inner start");	
+	//log.trace("#wait_frame_inner start");	
 	while (1) {
 		int result;
 		
-		//		log.trace("#wait_frame_inner #1");
+		//log.trace("#wait_frame_inner #1");
 		
 		while (state.sock_inbound_offset < state.sock_inbound_limit) {
 
 
-			//			log.trace("#wait_frame_inner #inner while start");
+			//log.trace("#wait_frame_inner #inner while start");
 
 			amqp_bytes_t buffer;
 			buffer.len = state.sock_inbound_limit - state.sock_inbound_offset;
 			buffer.bytes = (cast(char *) state.sock_inbound_buffer.bytes) + state.sock_inbound_offset;
 			
-			//			log.trace("wait_frame_inner handle input start");
+			//log.trace("wait_frame_inner handle input start");
 			
 			result = amqp_handle_input(state, buffer, decoded_frame);
 
-			//			log.trace("wait_frame_inner handle input end");
+			//log.trace("wait_frame_inner handle input end");
 
 			if (result < 0)
 			{
-				//				log.trace("wait_frame_inner result < 0");
+				//log.trace("wait_frame_inner result < 0");
 				return result;		
 			}
 
@@ -188,7 +188,7 @@ static int wait_frame_inner(amqp_connection_state_t *state,
 			if (decoded_frame.frame_type != 0) {
 				//Stdout.format("wait_frame_inner #4").newline;
 				/* Complete frame was read. Return it. */
-				//				log.trace("decoded_frame.frame_typ != 0");
+				//log.trace("decoded_frame.frame_typ != 0");
 				return 1;
 			}
 
@@ -198,27 +198,27 @@ static int wait_frame_inner(amqp_connection_state_t *state,
 
 		//Stdout.format("wait_frame_inner #5").newline;
 
-		//		log.trace("wait_frame_inner receive_buffer_from_socket start");
+		//log.trace("wait_frame_inner receive_buffer_from_socket start");
 		
 		result = receive_buffer_from_socket(state.socket,
 						    state.sock_inbound_buffer.bytes,
 						    state.sock_inbound_buffer.len);
 
-		//		log.trace("wait_frame_inner receive_buffer_from_socket end");
+		//log.trace("wait_frame_inner receive_buffer_from_socket end");
 
 		if (result < 0) {
-			//			log.trace("result < 0, errno = {}", -errno);
+			//log.trace("result < 0, errno = {}", -errno);
 			return -errno;
 		}
 		if (result == 0) {
 			/* EOF. */
-			//			log.trace("result == 0, returning", -errno);
+			//log.trace("result == 0, returning", -errno);
 			return 0;
 		}
 
 		state.sock_inbound_limit = result;
 		state.sock_inbound_offset = 0;
-		//		log.trace("#wait_frame_inner loop end");
+		//log.trace("#wait_frame_inner loop end");
 		
 	}
 }
@@ -559,7 +559,8 @@ int send_buffer_to_socket(Socket socket, void* buffer, uint length) {
 
 
 int receive_buffer_from_socket(Socket socket, void* buffer, uint length) {
-	//	log.trace("#receive_buffer_from_socket start. buffer length = {}", length);
+	//log.trace("#receive_buffer_from_socket start. buffer length = {}", length);
+	//Stdout.format("#receive_buffer_from_socket start. ").newline;
 	//	void[] buf_array = new void[length];
 	/*	if(buffer is null)
 		buf_array = new void[100000];*/
@@ -569,24 +570,24 @@ int receive_buffer_from_socket(Socket socket, void* buffer, uint length) {
 		buf_array = new void[length];
 		}*/
 
-	//	log.trace("#receive_buffer_from_socket socket receive start");
+	//log.trace("#receive_buffer_from_socket socket receive start");
 
 	int result = socket.receive(buf_array, SocketFlags.NONE);
 
-	//	log.trace("#receive_buffer_from_socket socket receive end");
+	//log.trace("#receive_buffer_from_socket socket receive end");
 
 	if (result < 0) 
 	{
-		//		log.trace("#receive_buffer_from_socket result < 0");
+		//log.trace("#receive_buffer_from_socket result < 0");
 		return result;
 	}
 
-	//	log.trace("#receive_buffer_from_socket memcpy start");
+	//log.trace("#receive_buffer_from_socket memcpy start");
 
 	memcpy(buffer, buf_array.ptr, buf_array.length);
 	//	memcpy(buffer, buf_array.ptr, length);
 
-	//	log.trace("#receive_buffer_from_socket memcpy end");
-	//	log.trace("#receive_buffer_from_socket end");
+	//log.trace("#receive_buffer_from_socket memcpy end");
+	//log.trace("#receive_buffer_from_socket end");
 	return result;
 }
