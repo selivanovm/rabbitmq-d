@@ -32,9 +32,10 @@ private import tango.core.Thread;
 import tango.io.Stdout;
 import tango.stdc.stdio;
 import tango.stdc.stdlib;
-import tango.net.Socket;
+import tango.net.device.Socket;
 import tango.stdc.string : strlenn = strlen;
 import tango.stdc.stringz;
+import tango.stdc.stdio : stdErr = stderr;
 
 import amqp_base;
 import amqp;
@@ -62,8 +63,8 @@ public static void main(char[][] args) {
   amqp_connection_state_t *conn;
 
   if (args.length < 8) {
-    fprintf(stderr, "Usage: amqp_sendstring host port exchange routingkey messagebody multiplier send_count\n");
-    return 1;
+    fprintf(stdErr, "Usage: amqp_sendstring host port exchange routingkey messagebody multiplier send_count\n");
+    return;
   }
 
   //Stdout.format("{} {} {} {} {}", args[1], args[2], args[3], args[4], args[5], args[6]).newline;
@@ -129,7 +130,7 @@ public static void main(char[][] args) {
   die_on_amqp_error(amqp_connection_close(conn, AMQP_REPLY_SUCCESS), "Closing connection");
   amqp_destroy_connection(conn);
 
-  return 0;
+  return;
 }
 
 public static char[] getString(char* s)

@@ -31,10 +31,10 @@
 import tango.io.Stdout;
 import tango.stdc.stdio;
 import tango.stdc.stdlib;
-import tango.net.Socket;
+import tango.net.device.Socket;
 import tango.stdc.string : strlenn = strlen;
 import tango.stdc.stringz;
-
+import tango.stdc.stdio : stdErr = stderr;
 
 import amqp_base;
 import amqp;
@@ -63,7 +63,7 @@ int main(char[][] args) {
 	amqp_bytes_t queuename;
 
 	if (args.length < 5) {
-		fprintf(stderr, "Usage: amqp_listen host port exchange bindingkey\n");
+		fprintf(stdErr, "Usage: amqp_listen host port exchange bindingkey\n");
 		return 1;
 	}
 
@@ -161,7 +161,7 @@ int main(char[][] args) {
 				break;
 
 			if (frame.frame_type != AMQP_FRAME_HEADER) {
-				fprintf(stderr, "Expected header!");
+				fprintf(stdErr, "Expected header!");
 				abort();
 			}
 			p = cast(amqp_basic_properties_t *) frame.payload.properties.decoded;
@@ -183,7 +183,7 @@ int main(char[][] args) {
 					break;
 
 				if (frame.frame_type != AMQP_FRAME_BODY) {
-					fprintf(stderr, "Expected body!");
+					fprintf(stdErr, "Expected body!");
 					abort();
 				}	  
 
