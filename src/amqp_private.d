@@ -26,9 +26,10 @@
 //
 // All Rights Reserved.
 //
-// Contributor(s): Mikhail Selivanov(Magnetosoft LLC).       
+// Contributor(s): Mikhail Selivanov.       
 //
-import tango.net.Socket;
+import tango.net.device.Socket;
+//import tango.stdc.posix.arpa.inet;
 import tango.stdc.string;
 import tango.stdc.stdio;
 import tango.stdc.stdlib;
@@ -125,14 +126,14 @@ public static uint16_t D_16(amqp_bytes_t b, int o)
 {
   uint16_t v; 
   memcpy(&v, BUF_AT(b, o), 2); 
-  return CL!(uint16_t).CHECK_LIMIT(b, o, 2, ntohs(v));
+  return CL!(uint16_t).CHECK_LIMIT(b, o, 2, _htons(v));
 }
 
 public static uint32_t D_32(amqp_bytes_t b, int o) 
 {
   uint32_t v; 
   memcpy(&v, BUF_AT(b, o), 4); 
-  return CL!(uint32_t).CHECK_LIMIT(b, o, 4, ntohl(v));
+  return CL!(uint32_t).CHECK_LIMIT(b, o, 4, _htonl(v));
 }
 
 public static uint64_t D_64(amqp_bytes_t b, int o) 
@@ -155,14 +156,14 @@ public static uint8_t E_8(amqp_bytes_t b, int o, uint8_t v)
 
 public static uint16_t E_16(amqp_bytes_t b, int o, uint16_t v)
 {
-  uint16_t vv = htons(v); 
+  uint16_t vv = _htons(v); 
   memcpy(BUF_AT(b, o), &vv, 2);
   return CL!(uint16_t).CHECK_LIMIT(b, o, 2, vv);
 }
 
 public static uint32_t E_32(amqp_bytes_t b, int o, uint32_t v)
 { 
-  uint32_t vv = htonl(v); 
+  uint32_t vv = _htonl(v); 
   memcpy(BUF_AT(b, o), &vv, 4);
   return CL!(uint32_t).CHECK_LIMIT(b, o, 4, vv);
 }
@@ -215,3 +216,43 @@ public static void amqp_dump(void* buffer, size_t len)
 {
   return cast(void) 0;
 }
+
+
+
+
+
+			 
+/*******************************************************************************
+
+        conversions for network byte-order
+
+*******************************************************************************/
+
+version(BigEndian)
+{
+        private ushort _htons (ushort x)
+        {
+                return x;
+        }
+
+        private uint _htonl (uint x)
+        {
+                return x;
+        }
+}
+else 
+{
+        private import tango.core.BitManip;
+
+        private ushort _htons (ushort x)
+        {
+                return cast(ushort) ((x >> 8) | (x << 8));
+        }
+
+        private uint _htonl (uint x)
+        {
+                return bswap(x);
+        }
+}
+
+/*******************************************************************************/

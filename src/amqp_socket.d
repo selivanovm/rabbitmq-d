@@ -29,7 +29,7 @@
 // Contributor(s): Mikhail Selivanov(Magnetosoft LLC).       
 //
 import tango.stdc.stdarg;
-import tango.net.Socket;
+import tango.net.device.Socket;
 import tango.net.InternetAddress;
 import tango.stdc.string : strlenn = strlen, memcpy, memset;
 import tango.stdc.stdlib;
@@ -67,7 +67,7 @@ static void[] buf_array;
 Socket amqp_open_socket(char[] hostname, int portnumber)
 {
   
-	Socket socket = new Socket(AddressFamily.INET, SocketType.STREAM, ProtocolType.IP, true);
+	Socket socket = new Socket(AddressFamily.INET, SocketType.STREAM, ProtocolType.IP);
 
 	socket.connect(new InternetAddress (hostname, portnumber));
 	buf_array = new void[INITIAL_INBOUND_SOCK_BUFFER_SIZE];
@@ -554,7 +554,7 @@ int send_buffer_to_socket(Socket socket, void* buffer, uint length) {
 	//  for(uint i = 0; i < length; i++)
 	//    buf_array[i] = *(buffer + i);
 
-	return socket.send(buf_array, SocketFlags.NONE);
+	return socket.write(buf_array);
 }
 
 
@@ -572,7 +572,7 @@ int receive_buffer_from_socket(Socket socket, void* buffer, uint length) {
 
 	//log.trace("#receive_buffer_from_socket socket receive start");
 
-	int result = socket.receive(buf_array, SocketFlags.NONE);
+	int result = socket.read(buf_array);
 
 	//log.trace("#receive_buffer_from_socket socket receive end");
 

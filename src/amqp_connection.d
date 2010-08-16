@@ -30,7 +30,7 @@
 //
 import tango.stdc.stdlib;
 import tango.io.Stdout;
-import tango.net.Socket;
+import tango.net.device.Socket;
 
 import amqp_base;
 import amqp_private;
@@ -143,7 +143,7 @@ void amqp_destroy_connection(amqp_connection_state_t *state) {
   empty_amqp_pool(&(*state).decoding_pool);
   free((*state).outbound_buffer.bytes);
   free((*state).sock_inbound_buffer.bytes);
-  (*state).socket.shutdown(SocketShutdown.BOTH);
+  (*state).socket.shutdown();
   free(state);
 }
 
