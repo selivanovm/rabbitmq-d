@@ -504,7 +504,9 @@ amqp_rpc_reply_t amqp_login(amqp_connection_state_t *state,
 	//Stdout.format("amqp_login #START").newline;
 
 	va_start(vl, sasl_method);
-
+        va_copy( vl, _argptr );
+        va_end( _argptr );
+                
 	//Stdout.format("amqp_login #1").newline;
 
 	amqp_login_inner(state, channel_max, frame_max, heartbeat, sasl_method, vl);
